@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AUTO_LANGUAGE, LANGUAGES } from "@/config/languages";
 import { DEFAULT_MODE, MODES, type ModeId } from "@/config/modes";
 import { MAX_CHARS, MAX_WORDS } from "@/config/limits";
+import { computeDiff, type Segment } from "@/lib/diff";
 import { splitStream } from "@/lib/stream-protocol";
 import { countWords } from "@/lib/text";
 import { useTurnstile } from "./useTurnstile";
@@ -17,15 +18,39 @@ interface ParaphraserProps {
   defaultLanguage?: string;
 }
 
+function Highlighted({ segments, kind }: { segments: Segment[]; kind: "added" | "removed" }) {
+  const cls =
+    kind === "added"
+      ? "rounded-sm bg-added-bg text-added-fg"
+      : "rounded-sm bg-removed-bg text-removed-fg";
+  return (
+    <>
+      {segments.map((s, i) =>
+        s.changed ? (
+          <mark key={i} className={cls}>
+            {s.text}
+          </mark>
+        ) : (
+          <span key={i}>{s.text}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO_LANGUAGE }: ParaphraserProps) {
   const [text, setText] = useState("");
   const [mode, setMode] = useState<ModeId>(defaultMode);
   const [language, setLanguage] = useState(defaultLanguage);
   const [output, setOutput] = useState("");
+  const [sourceText, setSourceText] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showChanges, setShowChanges] = useState(true);
+  const [editing, setEditing] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const turnstile = useTurnstile(TURNSTILE_SITE_KEY);
 
   const words = countWords(text);
@@ -35,12 +60,21 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  const diff = useMemo(
+    () => (status === "done" && output ? computeDiff(sourceText, output) : null),
+    [status, output, sourceText],
+  );
+  const highlight = showChanges && diff !== null;
+  const showOriginalDiff = highlight && !editing && text.trim() === sourceText;
+
   const paraphrase = useCallback(async () => {
     if (!canSubmit) return;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const submitted = text.trim();
+    setSourceText(submitted);
     setStatus("loading");
     setOutput("");
     setMessage(null);
@@ -61,7 +95,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
       const res = await fetch("/api/paraphrase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, mode, language, turnstileToken }),
+        body: JSON.stringify({ text: submitted, mode, language, turnstileToken }),
         signal: controller.signal,
       });
       turnstile.reset();
@@ -93,6 +127,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
       } else {
         if (control?.notice) setMessage(control.notice);
         setStatus("done");
+        setEditing(false);
       }
     } catch (err) {
       turnstile.reset();
@@ -106,9 +141,17 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
     abortRef.current?.abort();
     setText("");
     setOutput("");
+    setSourceText("");
     setMessage(null);
     setStatus("idle");
     setCopied(false);
+    setEditing(true);
+    textareaRef.current?.focus();
+  }
+
+  function startEditing() {
+    setEditing(true);
+    requestAnimationFrame(() => textareaRef.current?.focus());
   }
 
   async function copyOutput() {
@@ -123,6 +166,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
   }
 
   const outputWords = countWords(output);
+  const panelText = "min-h-56 flex-1 p-4 text-base leading-relaxed md:min-h-80";
 
   return (
     <section aria-label="Paraphrasing tool" className="rounded-2xl border border-border bg-surface shadow-sm">
@@ -163,63 +207,111 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
         </label>
       </div>
 
-      {/* Panels: stacked on phones, side by side on larger screens */}
+      {/* Panels: original left, rewrite right (stacked on phones) */}
       <div className="grid md:grid-cols-2">
         <div className="flex flex-col border-b border-border md:border-r md:border-b-0">
-          <label htmlFor="input-text" className="sr-only">
-            Text to paraphrase
-          </label>
-          <textarea
-            id="input-text"
-            dir="auto"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                void paraphrase();
-              }
-            }}
-            placeholder="Paste or type your text here, then press Paraphrase."
-            className="min-h-56 flex-1 resize-y bg-transparent p-4 text-base leading-relaxed outline-none placeholder:text-muted/70 md:min-h-80"
-          />
+          <div className="px-4 pt-3 text-xs font-semibold tracking-wide text-muted uppercase">Original</div>
+          {showOriginalDiff ? (
+            <div
+              dir="auto"
+              role="button"
+              tabIndex={0}
+              title="Click to edit"
+              onClick={startEditing}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  startEditing();
+                }
+              }}
+              className={`${panelText} cursor-text whitespace-pre-wrap`}
+            >
+              <Highlighted segments={diff!.original} kind="removed" />
+            </div>
+          ) : (
+            <>
+              <label htmlFor="input-text" className="sr-only">
+                Text to paraphrase
+              </label>
+              <textarea
+                id="input-text"
+                ref={textareaRef}
+                dir="auto"
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onFocus={() => setEditing(true)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    void paraphrase();
+                  }
+                }}
+                placeholder="Paste or type your text here, then press Paraphrase."
+                className={`${panelText} resize-y bg-transparent outline-none placeholder:text-muted/70`}
+              />
+            </>
+          )}
           <div className="flex items-center justify-between gap-2 px-4 pb-3 text-sm">
             <span className={overLimit ? "font-medium text-red-600 dark:text-red-400" : "text-muted"} aria-live="polite">
               {words.toLocaleString("en-US")} / {MAX_WORDS.toLocaleString("en-US")} words
             </span>
-            <button
-              type="button"
-              onClick={clearAll}
-              disabled={!text && !output}
-              className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-40"
-            >
-              Clear
-            </button>
+            <div className="flex items-center gap-1">
+              {showOriginalDiff && (
+                <button
+                  type="button"
+                  onClick={startEditing}
+                  className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground"
+                >
+                  Edit
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={clearAll}
+                disabled={!text && !output}
+                className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-40"
+              >
+                Clear
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="flex flex-col">
-          <div
-            dir="auto"
-            aria-live="polite"
-            aria-busy={busy}
-            className="min-h-56 flex-1 whitespace-pre-wrap p-4 text-base leading-relaxed md:min-h-80"
-          >
+          <div className="px-4 pt-3 text-xs font-semibold tracking-wide text-muted uppercase">Rewrite</div>
+          <div dir="auto" aria-live="polite" aria-busy={busy} className={`${panelText} whitespace-pre-wrap`}>
             {status === "loading" && <span className="animate-pulse text-muted">Rewriting…</span>}
-            {output}
-            {status === "streaming" && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-accent align-middle" />}
-            {status === "idle" && !output && <span className="text-muted/70">Your rewritten text will appear here.</span>}
+            {highlight ? <Highlighted segments={diff!.rewrite} kind="added" /> : output}
+            {status === "streaming" && (
+              <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-accent align-middle" />
+            )}
+            {status === "idle" && !output && (
+              <span className="text-muted/70">Your rewritten text will appear here.</span>
+            )}
           </div>
-          <div className="flex items-center justify-between gap-2 px-4 pb-3 text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-3 text-sm">
             <span className="text-muted">{output ? `${outputWords.toLocaleString("en-US")} words` : ""}</span>
-            <button
-              type="button"
-              onClick={copyOutput}
-              disabled={!output || busy}
-              className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-40"
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
+            <div className="flex items-center gap-1">
+              {diff && (
+                <label className="flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 text-muted select-none hover:text-foreground">
+                  <input
+                    type="checkbox"
+                    checked={showChanges}
+                    onChange={(e) => setShowChanges(e.target.checked)}
+                    className="accent-accent"
+                  />
+                  Show changes
+                </label>
+              )}
+              <button
+                type="button"
+                onClick={copyOutput}
+                disabled={!output || busy}
+                className="rounded-lg px-3 py-1.5 font-medium text-accent hover:bg-accent-soft disabled:opacity-40"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -230,7 +322,8 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
       {/* Action bar */}
       <div className="flex flex-col-reverse gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
         <p role="status" className={`min-h-5 text-sm ${status === "error" ? "text-red-600 dark:text-red-400" : "text-muted"}`}>
-          {message ?? (overLimit ? `Please shorten your text to ${MAX_WORDS.toLocaleString("en-US")} words or fewer.` : "")}
+          {message ??
+            (overLimit ? `Please shorten your text to ${MAX_WORDS.toLocaleString("en-US")} words or fewer.` : "")}
         </p>
         <button
           type="button"

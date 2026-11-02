@@ -13,6 +13,9 @@ export function Header() {
           <span>{siteConfig.name}</span>
         </Link>
         <nav className="flex items-center gap-1 text-sm sm:gap-3">
+          <Link href="/guides" className="hidden rounded px-2 py-1 text-muted hover:text-foreground sm:inline">
+            Guides
+          </Link>
           <Link href="/about" className="hidden rounded px-2 py-1 text-muted hover:text-foreground sm:inline">
             About
           </Link>
