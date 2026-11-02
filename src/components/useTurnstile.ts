@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 
 interface TurnstileApi {
   render(container: HTMLElement, options: Record<string, unknown>): string;
-  execute(widgetId: string): void;
   reset(widgetId: string): void;
   remove(widgetId: string): void;
 }
@@ -16,6 +15,7 @@ declare global {
 }
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const TOKEN_WAIT_MS = 20_000;
 let scriptPromise: Promise<void> | null = null;
 
 function loadScript(): Promise<void> {
@@ -37,18 +37,23 @@ function loadScript(): Promise<void> {
   return scriptPromise;
 }
 
-type Pending = { resolve: (token: string) => void; reject: (err: Error) => void };
+type Waiter = (token: string) => void;
 
 /**
- * Invisible Cloudflare Turnstile. The challenge runs only when getToken() is
- * called (on Paraphrase); most visitors never see anything. If Cloudflare needs
- * a click, the widget appears inside the container.
+ * Invisible Cloudflare Turnstile that always keeps one fresh token ready.
+ *
+ * The widget solves its challenge in the background as soon as the page loads.
+ * Each token can be used only once, so getToken() hands out the current token
+ * and immediately resets the widget, which starts fetching the next one while
+ * the user reads the result. Most visitors never see anything; if Cloudflare
+ * needs a click, the checkbox appears inside the container.
  * Without NEXT_PUBLIC_TURNSTILE_SITE_KEY (local dev) getToken() returns "".
  */
 export function useTurnstile(siteKey: string | undefined) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
-  const pending = useRef<Pending | null>(null);
+  const token = useRef<string | null>(null);
+  const waiters = useRef<Waiter[]>([]);
 
   useEffect(() => {
     if (!siteKey) return;
@@ -58,18 +63,24 @@ export function useTurnstile(siteKey: string | undefined) {
         if (cancelled || !containerRef.current || !window.turnstile || widgetId.current) return;
         widgetId.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
-          execution: "execute",
           appearance: "interaction-only",
-          callback: (token: string) => {
-            pending.current?.resolve(token);
-            pending.current = null;
-          },
-          "error-callback": () => {
-            pending.current?.reject(new Error("Turnstile error"));
-            pending.current = null;
+          "refresh-expired": "auto",
+          callback: (t: string) => {
+            const waiter = waiters.current.shift();
+            if (waiter) {
+              // Someone is already waiting: hand it over and start on the next one.
+              waiter(t);
+              if (widgetId.current) window.turnstile?.reset(widgetId.current);
+            } else {
+              token.current = t;
+            }
           },
           "expired-callback": () => {
-            if (widgetId.current) window.turnstile?.reset(widgetId.current);
+            token.current = null;
+          },
+          "error-callback": () => {
+            token.current = null;
+            // Returning nothing lets Turnstile retry automatically.
           },
         });
       })
@@ -80,41 +91,34 @@ export function useTurnstile(siteKey: string | undefined) {
       cancelled = true;
       if (widgetId.current) window.turnstile?.remove(widgetId.current);
       widgetId.current = null;
+      token.current = null;
     };
   }, [siteKey]);
 
+  /** Returns a fresh, never-used token (waiting for one if necessary). */
   const getToken = useCallback(async (): Promise<string> => {
     if (!siteKey) return "";
     await loadScript();
-    // The widget renders asynchronously after the script loads.
-    for (let i = 0; i < 50 && !widgetId.current; i++) await new Promise((r) => setTimeout(r, 100));
-    const id = widgetId.current;
-    if (!id || !window.turnstile) throw new Error("Turnstile not ready");
 
-    pending.current?.reject(new Error("superseded"));
+    const ready = token.current;
+    if (ready) {
+      token.current = null;
+      if (widgetId.current) window.turnstile?.reset(widgetId.current); // prefetch the next one
+      return ready;
+    }
+
     return new Promise<string>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        pending.current = null;
-        reject(new Error("Turnstile timeout"));
-      }, 30_000);
-      pending.current = {
-        resolve: (t) => {
-          clearTimeout(timer);
-          resolve(t);
-        },
-        reject: (e) => {
-          clearTimeout(timer);
-          reject(e);
-        },
+      const waiter: Waiter = (t) => {
+        clearTimeout(timer);
+        resolve(t);
       };
-      window.turnstile!.execute(id);
+      const timer = setTimeout(() => {
+        waiters.current = waiters.current.filter((w) => w !== waiter);
+        reject(new Error("Turnstile timeout"));
+      }, TOKEN_WAIT_MS);
+      waiters.current.push(waiter);
     });
   }, [siteKey]);
 
-  /** Tokens are single-use: reset after each request so the next one gets a fresh token. */
-  const reset = useCallback(() => {
-    if (widgetId.current) window.turnstile?.reset(widgetId.current);
-  }, []);
-
-  return useMemo(() => ({ containerRef, getToken, reset }), [getToken, reset]);
+  return useMemo(() => ({ containerRef, getToken }), [getToken]);
 }

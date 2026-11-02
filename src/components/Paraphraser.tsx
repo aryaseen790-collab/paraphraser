@@ -80,25 +80,31 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
     setMessage(null);
     setCopied(false);
 
-    let turnstileToken = "";
-    try {
-      turnstileToken = await turnstile.getToken();
-    } catch {
-      setMessage("We couldn't verify your browser. Please refresh the page and try again.");
-      setStatus("error");
-      turnstile.reset();
-      return;
-    }
-    if (controller.signal.aborted) return;
-
-    try {
-      const res = await fetch("/api/paraphrase", {
+    const send = async () => {
+      const turnstileToken = await turnstile.getToken();
+      return fetch("/api/paraphrase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: submitted, mode, language, turnstileToken }),
         signal: controller.signal,
       });
-      turnstile.reset();
+    };
+
+    try {
+      let res: Response;
+      try {
+        res = await send();
+        // A rejected bot-check token (e.g. expired) gets one silent retry with a fresh token.
+        if (res.status === 403 && !controller.signal.aborted) res = await send();
+      } catch (err) {
+        if ((err as Error).name === "AbortError") throw err;
+        if ((err as Error).message.startsWith("Turnstile")) {
+          setMessage("We couldn't verify your browser. Please refresh the page and try again.");
+          setStatus("error");
+          return;
+        }
+        throw err;
+      }
 
       if (!res.ok || !res.body) {
         const data = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -130,7 +136,6 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
         setEditing(false);
       }
     } catch (err) {
-      turnstile.reset();
       if ((err as Error).name === "AbortError") return;
       setMessage("Network error. Please check your connection and try again.");
       setStatus("error");
