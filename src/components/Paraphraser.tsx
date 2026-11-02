@@ -171,10 +171,10 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
   }
 
   const outputWords = countWords(output);
-  const panelText = "min-h-56 flex-1 p-4 text-base leading-relaxed md:min-h-80";
+  const panelText = "min-h-56 flex-1 px-4 py-3 text-[1.0625rem] leading-relaxed sm:px-5 md:min-h-80";
 
   return (
-    <section aria-label="Paraphrasing tool" className="rounded-2xl border border-border bg-surface shadow-sm">
+    <section aria-label="Paraphrasing tool" className="relative rounded-[28px] border border-border bg-surface shadow-card">
       {/* Controls */}
       <div className="flex flex-col gap-3 border-b border-border p-3 sm:p-4 xl:flex-row xl:items-center xl:justify-between">
         <div role="radiogroup" aria-label="Style" className="-mx-1 flex min-w-0 gap-1.5 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible md:pb-0">
@@ -188,8 +188,8 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
               onClick={() => setMode(m.id)}
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
                 mode === m.id
-                  ? "border-accent bg-accent text-white"
-                  : "border-border bg-surface text-muted hover:border-accent hover:text-foreground"
+                  ? "border-foreground bg-foreground text-background"
+                  : "border-border bg-surface text-muted hover:border-foreground/40 hover:text-foreground"
               }`}
             >
               {m.label}
@@ -201,7 +201,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="w-full min-w-0 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-foreground md:w-auto xl:max-w-64"
+            className="w-full min-w-0 rounded-full border border-border bg-surface px-3.5 py-1.5 text-foreground md:w-auto xl:max-w-64"
           >
             {LANGUAGES.map((l) => (
               <option key={l.id} value={l.id}>
@@ -215,7 +215,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
       {/* Panels: original left, rewrite right (stacked on phones) */}
       <div className="grid md:grid-cols-2">
         <div className="flex flex-col border-b border-border md:border-r md:border-b-0">
-          <div className="px-4 pt-3 text-xs font-semibold tracking-wide text-muted uppercase">Original</div>
+          <div className="px-4 pt-4 font-mono text-[11px] tracking-[0.16em] text-muted uppercase sm:px-5">Your text</div>
           {showOriginalDiff ? (
             <div
               dir="auto"
@@ -256,7 +256,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
               />
             </>
           )}
-          <div className="flex items-center justify-between gap-2 px-4 pb-3 text-sm">
+          <div className="flex items-center justify-between gap-2 px-4 pb-3 text-sm sm:px-5">
             <span className={overLimit ? "font-medium text-red-600 dark:text-red-400" : "text-muted"} aria-live="polite">
               {words.toLocaleString("en-US")} / {MAX_WORDS.toLocaleString("en-US")} words
             </span>
@@ -265,7 +265,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                 <button
                   type="button"
                   onClick={startEditing}
-                  className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground"
+                  className="rounded-full px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground"
                 >
                   Edit
                 </button>
@@ -274,7 +274,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                 type="button"
                 onClick={clearAll}
                 disabled={!text && !output}
-                className="rounded-lg px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-40"
+                className="rounded-full px-3 py-1.5 text-muted hover:bg-surface-muted hover:text-foreground disabled:opacity-40"
               >
                 Clear
               </button>
@@ -283,7 +283,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
         </div>
 
         <div className="flex flex-col">
-          <div className="px-4 pt-3 text-xs font-semibold tracking-wide text-muted uppercase">Rewrite</div>
+          <div className="px-4 pt-4 font-mono text-[11px] tracking-[0.16em] text-muted uppercase sm:px-5">Rewrite</div>
           <div dir="auto" aria-live="polite" aria-busy={busy} className={`${panelText} whitespace-pre-wrap`}>
             {status === "loading" && <span className="animate-pulse text-muted">Rewriting…</span>}
             {highlight ? <Highlighted segments={diff!.rewrite} kind="added" /> : output}
@@ -294,7 +294,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
               <span className="text-muted/70">Your rewritten text will appear here.</span>
             )}
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-3 text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-3 text-sm sm:px-5">
             <span className="text-muted">{output ? `${outputWords.toLocaleString("en-US")} words` : ""}</span>
             <div className="flex items-center gap-1">
               {diff && (
@@ -303,7 +303,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                     type="checkbox"
                     checked={showChanges}
                     onChange={(e) => setShowChanges(e.target.checked)}
-                    className="accent-accent"
+                    className="accent-[var(--accent)]"
                   />
                   Show changes
                 </label>
@@ -312,7 +312,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                 type="button"
                 onClick={copyOutput}
                 disabled={!output || busy}
-                className="rounded-lg px-3 py-1.5 font-medium text-accent hover:bg-accent-soft disabled:opacity-40"
+                className="rounded-full px-3.5 py-1.5 font-medium text-accent-text hover:bg-accent-soft disabled:opacity-40"
               >
                 {copied ? "Copied!" : "Copy"}
               </button>
@@ -325,18 +325,30 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
       <div ref={turnstile.containerRef} className="flex justify-center empty:hidden" />
 
       {/* Action bar */}
-      <div className="flex flex-col-reverse gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
-        <p role="status" className={`min-h-5 text-sm ${status === "error" ? "text-red-600 dark:text-red-400" : "text-muted"}`}>
+      <div className="flex flex-col-reverse gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 sm:pl-5">
+        <p role="status" className={`text-sm empty:hidden sm:min-h-5 ${status === "error" ? "text-red-600 dark:text-red-400" : "text-muted"}`}>
           {message ??
-            (overLimit ? `Please shorten your text to ${MAX_WORDS.toLocaleString("en-US")} words or fewer.` : "")}
+            (overLimit ? (
+              `Please shorten your text to ${MAX_WORDS.toLocaleString("en-US")} words or fewer.`
+            ) : (
+              <span className="hidden sm:inline">
+                Tip: press <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Ctrl</kbd> +{" "}
+                <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd> to paraphrase.
+              </span>
+            ))}
         </p>
         <button
           type="button"
           onClick={() => void paraphrase()}
           disabled={!canSubmit}
-          className="w-full rounded-xl bg-accent px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent shadow-sm transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
           {busy ? "Paraphrasing…" : "Paraphrase"}
+          {!busy && (
+            <svg viewBox="0 0 16 16" className="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
         </button>
       </div>
     </section>

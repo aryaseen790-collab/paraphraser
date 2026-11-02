@@ -28,6 +28,8 @@ export default async function LandingPage({ params }: PageProps<"/[slug]">) {
   return (
     <ToolPage
       h1={page.h1}
+      name={page.h1}
+      eyebrow={page.language ? "Free paraphrasing tool · " + page.h1.replace(" Paraphrasing Tool", "") : "Free paraphrasing tool · " + (page.mode ? page.mode[0].toUpperCase() + page.mode.slice(1) : "") + " style"}
       intro={page.intro}
       native={page.native}
       mode={page.mode}

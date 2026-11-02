@@ -3,36 +3,43 @@
 /* Dark mode follows a `.dark` class on <html>, set before paint by ThemeScript. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Warm "paper and ink" palette with one vermillion accent. */
 :root {
-  --background: #f7f7fb;
-  --surface: #ffffff;
-  --surface-muted: #f0f1f6;
-  --foreground: #16171d;
-  --muted: #5b5e6b;
-  --border: #e2e4ec;
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-soft: #eef0ff;
-  --added-bg: #d9f7e3;
-  --added-fg: #0d5c2c;
-  --removed-bg: #fde2e2;
-  --removed-fg: #8a1c1c;
+  --background: #f7f4ee;
+  --surface: #fffdf9;
+  --surface-muted: #f1ece3;
+  --foreground: #1d1b18;
+  --muted: #6b655c;
+  --border: #e5ded2;
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-text: #c2410c;
+  --accent-soft: #fde5d6;
+  --on-accent: #ffffff;
+  --dot: #d9d1c3;
+  --added-bg: #dcf3e3;
+  --added-fg: #14532d;
+  --removed-bg: #fde3dc;
+  --removed-fg: #9a2d12;
 }
 
 .dark {
-  --background: #0d0e13;
-  --surface: #16171f;
-  --surface-muted: #1d1f29;
-  --foreground: #ecedf2;
-  --muted: #9a9db0;
-  --border: #2a2d3a;
-  --accent: #6366f1;
-  --accent-hover: #7c7ff5;
-  --accent-soft: #1e2140;
-  --added-bg: #0f3b22;
-  --added-fg: #9ff0bd;
-  --removed-bg: #4a1717;
-  --removed-fg: #ffb4b4;
+  --background: #12110f;
+  --surface: #1b1a17;
+  --surface-muted: #24221e;
+  --foreground: #efe9df;
+  --muted: #a39b8f;
+  --border: #302c27;
+  --accent: #ea580c;
+  --accent-hover: #f97316;
+  --accent-text: #fb923c;
+  --accent-soft: #3d2416;
+  --on-accent: #ffffff;
+  --dot: #2c2924;
+  --added-bg: #163a24;
+  --added-fg: #a7f0c0;
+  --removed-bg: #46201a;
+  --removed-fg: #ffb8a6;
 }
 
 @theme inline {
@@ -44,17 +51,21 @@
   --color-border: var(--border);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-text: var(--accent-text);
   --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-added-bg: var(--added-bg);
   --color-added-fg: var(--added-fg);
   --color-removed-bg: var(--removed-bg);
   --color-removed-fg: var(--removed-fg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
 }
 
 html {
   color-scheme: light;
+  scroll-behavior: smooth;
 }
 html.dark {
   color-scheme: dark;
@@ -66,11 +77,101 @@ body {
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", "Noto Sans", "Noto Nastaliq Urdu", "Noto Naskh Arabic", sans-serif;
 }
 
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
+}
+
+/* Soft card shadow used by the tool and feature cards. */
+@utility shadow-card {
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.02),
+    0 24px 60px -28px rgb(60 40 20 / 0.28);
+}
+
+/* Dotted paper texture behind the hero, fading out downwards. */
+.hero-dots {
+  background-image: radial-gradient(var(--dot) 1.1px, transparent 1.1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 85%);
+}
+
+/* Highlighter swash behind an emphasised word in headings. */
+.swash {
+  font-style: italic;
+  color: var(--accent-text);
+  background: linear-gradient(100deg, transparent 1%, var(--accent-soft) 2%, var(--accent-soft) 98%, transparent 99%) 0 88% / 100% 0.38em
+    no-repeat;
+  padding: 0 0.08em;
+}
+
+.rise {
+  animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise-2 {
+  animation-delay: 0.08s;
+}
+.rise-3 {
+  animation-delay: 0.16s;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* Long-form content pages (About, Privacy, Terms, guides) */
-.prose-page h1 { font-size: 1.875rem; font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
-.prose-page h2 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.5rem; }
-.prose-page p, .prose-page li { color: var(--muted); line-height: 1.7; }
-.prose-page p { margin-bottom: 0.875rem; }
-.prose-page ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.875rem; }
-.prose-page a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
-.prose-page strong { color: var(--foreground); }
+.prose-page h1 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+.prose-page h2 {
+  font-family: var(--font-display), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+.prose-page p,
+.prose-page li {
+  color: var(--muted);
+  line-height: 1.75;
+  font-size: 1.0625rem;
+}
+.prose-page p {
+  margin-bottom: 1rem;
+}
+.prose-page ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 1rem;
+}
+.prose-page li {
+  margin-bottom: 0.35rem;
+}
+.prose-page a {
+  color: var(--accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-page strong {
+  color: var(--foreground);
+}

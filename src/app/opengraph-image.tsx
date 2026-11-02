@@ -16,8 +16,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: 80,
-          background: "linear-gradient(135deg, #eef0ff 0%, #ffffff 60%)",
-          color: "#16171d",
+          background: "#f7f4ee",
+          color: "#1d1b18",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 40, fontWeight: 700 }}>
@@ -26,19 +26,22 @@ export default function OpengraphImage() {
               width: 72,
               height: 72,
               borderRadius: 16,
-              background: "#4f46e5",
+              background: "#1d1b18",
+              fontStyle: "italic",
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            P
+            p
           </div>
           {siteConfig.name}
         </div>
-        <div style={{ marginTop: 40, fontSize: 72, fontWeight: 800, lineHeight: 1.1 }}>Free Paraphrasing Tool</div>
-        <div style={{ marginTop: 24, fontSize: 34, color: "#5b5e6b" }}>
+        <div style={{ marginTop: 40, fontSize: 76, fontWeight: 800, lineHeight: 1.05, display: "flex", flexWrap: "wrap" }}>
+          The free paraphrasing tool for&nbsp;<span style={{ color: "#c2410c", fontStyle: "italic" }}>clearer</span>&nbsp;writing
+        </div>
+        <div style={{ marginTop: 24, fontSize: 34, color: "#6b655c" }}>
           Seven styles · Many languages · No sign-up
         </div>
       </div>
