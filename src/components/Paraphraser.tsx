@@ -6,6 +6,9 @@ import { DEFAULT_MODE, MODES, type ModeId } from "@/config/modes";
 import { MAX_CHARS, MAX_WORDS } from "@/config/limits";
 import { splitStream } from "@/lib/stream-protocol";
 import { countWords } from "@/lib/text";
+import { useTurnstile } from "./useTurnstile";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 type Status = "idle" | "loading" | "streaming" | "done" | "error";
 
@@ -23,6 +26,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const turnstile = useTurnstile(TURNSTILE_SITE_KEY);
 
   const words = countWords(text);
   const overLimit = words > MAX_WORDS || text.trim().length > MAX_CHARS;
@@ -42,13 +46,25 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
     setMessage(null);
     setCopied(false);
 
+    let turnstileToken = "";
+    try {
+      turnstileToken = await turnstile.getToken();
+    } catch {
+      setMessage("We couldn't verify your browser. Please refresh the page and try again.");
+      setStatus("error");
+      turnstile.reset();
+      return;
+    }
+    if (controller.signal.aborted) return;
+
     try {
       const res = await fetch("/api/paraphrase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, mode, language }),
+        body: JSON.stringify({ text, mode, language, turnstileToken }),
         signal: controller.signal,
       });
+      turnstile.reset();
 
       if (!res.ok || !res.body) {
         const data = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -79,11 +95,12 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
         setStatus("done");
       }
     } catch (err) {
+      turnstile.reset();
       if ((err as Error).name === "AbortError") return;
       setMessage("Network error. Please check your connection and try again.");
       setStatus("error");
     }
-  }, [canSubmit, text, mode, language]);
+  }, [canSubmit, text, mode, language, turnstile]);
 
   function clearAll() {
     abortRef.current?.abort();
@@ -206,6 +223,9 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
           </div>
         </div>
       </div>
+
+      {/* Turnstile shows a checkbox here only if Cloudflare is unsure about a visitor. */}
+      <div ref={turnstile.containerRef} className="flex justify-center empty:hidden" />
 
       {/* Action bar */}
       <div className="flex flex-col-reverse gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
