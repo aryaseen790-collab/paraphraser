@@ -30,9 +30,9 @@ export default function AboutPage() {
 
       <h2>What it does</h2>
       <p>
-        You can rewrite up to {MAX_WORDS.toLocaleString("en-US")} words at a time in seven styles: Standard, Fluent,
-        Formal, Simple, Creative, Shorten and Expand. It works in English, Urdu, Arabic, Hindi, Spanish, French and
-        several other languages. The rewrite appears as it’s written, and the words that changed are highlighted so you
+        You can rewrite up to {MAX_WORDS.toLocaleString("en-US")} words at a time in eight styles: Standard, Humanize,
+        Fluent, Formal, Simple, Creative, Shorten and Expand. It works in English, Urdu, Arabic, Hindi, Spanish, French,
+        Filipino and several other languages. The rewrite appears as it’s written, and the words that changed are highlighted so you
         can check them at a glance.
       </p>
 

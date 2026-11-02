@@ -7,7 +7,7 @@ export const siteConfig = {
   url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/+$/, ""),
   tagline: "Free AI paraphrasing tool. No sign-up, no limits for normal use.",
   description:
-    "Rewrite any text in seconds with a free AI paraphrasing tool. Seven styles (Standard, Fluent, Formal, Simple, Creative, Shorten, Expand), many languages, no sign-up.",
+    "Paraphrase and humanize AI text free. Rewrite any text in eight styles, including a built-in AI humanizer, in many languages, no sign-up.",
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@example.com",
   adsEnabled: process.env.NEXT_PUBLIC_ADS_ENABLED === "true",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",

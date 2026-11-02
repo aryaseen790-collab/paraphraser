@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LANGUAGE_PAGES, MODE_PAGES } from "@/config/landing";
+import { HUMANIZER_PAGES, LANGUAGE_PAGES, MODE_PAGES } from "@/config/landing";
 import { Section } from "./Section";
 
 export function MoreTools({ current }: { current?: string }) {
@@ -25,8 +25,8 @@ export function MoreTools({ current }: { current?: string }) {
   return (
     <Section number="More tools" title="Try another style or language">
       <div className="grid gap-8 md:grid-cols-2">
-        {group("Writing styles", MODE_PAGES)}
-        {group("Languages", LANGUAGE_PAGES)}
+        {group("Writing styles", [...HUMANIZER_PAGES.filter((p) => !p.language), ...MODE_PAGES])}
+        {group("Languages", [...LANGUAGE_PAGES, ...HUMANIZER_PAGES.filter((p) => p.language)])}
       </div>
     </Section>
   );

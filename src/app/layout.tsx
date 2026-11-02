@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `Free Paraphrasing Tool: Rewrite Text in 7 Styles, No Sign-up | ${siteConfig.name}`,
+    default: `Free Paraphrasing Tool & AI Humanizer | ${siteConfig.name}`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,

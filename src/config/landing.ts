@@ -14,7 +14,40 @@ export interface LandingPage {
   intro: string;
   /** Optional greeting line in the page's own language (rendered with lang/dir). */
   native?: { lang: string; text: string };
+  /** Small label above the heading. */
+  eyebrow?: string;
+  /** Long-form content block to show under the tool instead of the default. */
+  content?: "humanize" | "humanize-tagalog";
 }
+
+export const HUMANIZER_PAGES: LandingPage[] = [
+  {
+    slug: "humanize-ai",
+    mode: "humanize",
+    eyebrow: "Free AI humanizer",
+    title: "Humanize AI Text Free | AI Humanizer Tool",
+    description:
+      "Humanize AI text in seconds. Our free AI humanizer turns stiff, robotic drafts into natural writing that sounds like you. No sign-up, no word credits.",
+    h1: "Humanize AI text so it sounds like you",
+    intro:
+      "Paste a draft that reads like it came off a production line. Our free AI humanizer reworks the rhythm, trims the filler and swaps generic phrasing for plain, specific language, while your facts stay exactly where you left them.",
+    content: "humanize",
+  },
+  {
+    slug: "humanize-ai-tagalog",
+    mode: "humanize",
+    language: "tl",
+    eyebrow: "AI humanizer · Tagalog",
+    title: "Humanize AI Tagalog: Free Tagalog AI Humanizer",
+    description:
+      "Humanize AI text in Tagalog for free. Make Filipino drafts written with AI sound natural and conversational. No sign-up needed.",
+    h1: "Humanize AI text in Tagalog",
+    intro:
+      "Drafted something in Filipino with the help of AI and it sounds a little too textbook? Paste it below. The Tagalog humanizer rewrites it in natural, everyday Filipino, keeping your meaning, names and numbers intact.",
+    native: { lang: "tl", text: "Gawing natural at parang tao ang sulat mo." },
+    content: "humanize-tagalog",
+  },
+];
 
 export const MODE_PAGES: LandingPage[] = [
   {
@@ -87,10 +120,10 @@ export const LANGUAGE_PAGES: LandingPage[] = [
     slug: "english-paraphrasing-tool",
     language: "en",
     title: "English Paraphrasing Tool",
-    description: "Free English paraphrasing tool with seven styles, from formal to simple. No sign-up needed.",
+    description: "Free English paraphrasing tool with eight styles, from formal to simple. No sign-up needed.",
     h1: "English Paraphrasing Tool",
     intro:
-      "Rewrite English text in seven styles. Paste text in another language and it will be paraphrased into clear English, which helps when you draft in your first language.",
+      "Rewrite English text in eight styles. Paste text in another language and it will be paraphrased into clear English, which helps when you draft in your first language.",
   },
   {
     slug: "urdu-paraphrasing-tool",
@@ -116,7 +149,7 @@ export const LANGUAGE_PAGES: LandingPage[] = [
     slug: "hindi-paraphrasing-tool",
     language: "hi",
     title: "Hindi Paraphrasing Tool (हिन्दी)",
-    description: "Free Hindi paraphrasing tool. Rewrite Hindi text in Devanagari in seven styles. No sign-up.",
+    description: "Free Hindi paraphrasing tool. Rewrite Hindi text in Devanagari in eight styles. No sign-up.",
     h1: "Hindi Paraphrasing Tool",
     intro:
       "Paste Hindi text to get a fresh version in Devanagari script, whether you need it simpler, more formal or shorter.",
@@ -136,7 +169,7 @@ export const LANGUAGE_PAGES: LandingPage[] = [
     slug: "french-paraphrasing-tool",
     language: "fr",
     title: "French Paraphrasing Tool (Reformulateur de Texte)",
-    description: "Reformulez vos textes en français gratuitement. Free French paraphrasing tool in seven styles.",
+    description: "Reformulez vos textes en français gratuitement. Free French paraphrasing tool in eight styles.",
     h1: "French Paraphrasing Tool",
     intro:
       "Rewrite French text in a more formal, fluent or concise way: useful for letters, coursework and professional emails.",
@@ -159,7 +192,7 @@ export const LANGUAGE_PAGES: LandingPage[] = [
     description: "Parafraseador grátis em português. Free Portuguese paraphrasing tool, no sign-up.",
     h1: "Portuguese Paraphrasing Tool",
     intro:
-      "Rewrite Portuguese text in seven styles, from simple to formal, keeping your meaning intact.",
+      "Rewrite Portuguese text in eight styles, from simple to formal, keeping your meaning intact.",
     native: { lang: "pt", text: "Parafraseie textos em português com facilidade." },
   },
   {
@@ -194,7 +227,7 @@ export const LANGUAGE_PAGES: LandingPage[] = [
   },
 ];
 
-export const LANDING_PAGES: LandingPage[] = [...MODE_PAGES, ...LANGUAGE_PAGES];
+export const LANDING_PAGES: LandingPage[] = [...HUMANIZER_PAGES, ...MODE_PAGES, ...LANGUAGE_PAGES];
 
 export function getLandingPage(slug: string): LandingPage | undefined {
   return LANDING_PAGES.find((p) => p.slug === slug);

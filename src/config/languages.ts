@@ -21,6 +21,7 @@ export const LANGUAGES: Language[] = [
   { id: "id", name: "Indonesian", label: "Indonesian (Bahasa Indonesia)" },
   { id: "tr", name: "Turkish", label: "Turkish (Türkçe)" },
   { id: "bn", name: "Bengali", label: "Bengali (বাংলা)" },
+  { id: "tl", name: "Filipino (Tagalog)", label: "Filipino (Tagalog)" },
 ];
 
 export function getLanguage(id: string): Language | undefined {

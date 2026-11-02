@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { ModeId } from "@/config/modes";
 import { siteConfig } from "@/config/site";
-import { faqJsonLd } from "@/content/faq";
+import { faqJsonLd, type FaqItem } from "@/content/faq";
 import { AdSlot } from "./AdSlot";
 import { InfoSections } from "./InfoSections";
 import { MoreTools } from "./MoreTools";
@@ -19,12 +19,14 @@ interface ToolPageProps {
   slug?: string;
   /** Content under the tool. Defaults to the short how-it-works + FAQ block. */
   children?: ReactNode;
+  /** FAQ items for structured data, when the page shows its own FAQ. */
+  faqs?: FaqItem[];
 }
 
-const FACTS = ["No account needed", "Up to 1,000 words at a time", "Seven writing styles", "Twelve languages"];
+const FACTS = ["No account needed", "Up to 1,000 words at a time", "Eight writing styles", "Twelve languages"];
 
 /** Shared layout for the home page and every SEO landing page. */
-export function ToolPage({ h1, name, intro, eyebrow = "Free paraphrasing tool", native, mode, language, slug, children }: ToolPageProps) {
+export function ToolPage({ h1, name, intro, eyebrow = "Free paraphrasing tool", native, mode, language, slug, children, faqs }: ToolPageProps) {
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -35,7 +37,7 @@ export function ToolPage({ h1, name, intro, eyebrow = "Free paraphrasing tool", 
       operatingSystem: "Any",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     },
-    faqJsonLd(),
+    faqJsonLd(faqs),
   ];
 
   return (

@@ -1,6 +1,11 @@
 import { MAX_WORDS } from "@/config/limits";
 
-export const FAQS: { q: string; a: string }[] = [
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export const FAQS: FaqItem[] = [
   {
     q: "Is it really free?",
     a: `Yes. There’s no sign-up and no daily credit counter. Each request can be up to ${MAX_WORDS.toLocaleString("en-US")} words, and you can run as many as you need for normal writing. Ads next to the tool cover the running costs.`,
@@ -31,11 +36,11 @@ export const FAQS: { q: string; a: string }[] = [
   },
 ];
 
-export function faqJsonLd() {
+export function faqJsonLd(items: FaqItem[] = FAQS) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQS.map((f) => ({
+    mainEntity: items.map((f) => ({
       "@type": "Question",
       name: f.q,
       acceptedAnswer: { "@type": "Answer", text: f.a },

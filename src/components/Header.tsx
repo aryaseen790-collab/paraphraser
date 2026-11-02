@@ -3,6 +3,7 @@ import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const nav = [
+  { href: "/humanize-ai", label: "AI Humanizer" },
   { href: "/#styles", label: "Styles" },
   { href: "/#languages", label: "Languages" },
   { href: "/guides", label: "Guides" },
@@ -20,7 +21,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               className={`rounded-full px-3 py-1.5 text-muted transition hover:bg-surface-muted hover:text-foreground ${
-                i < 2 ? "hidden md:inline-block" : "hidden sm:inline-block"
+                i === 0 ? "hidden sm:inline-block" : i < 3 ? "hidden lg:inline-block" : "hidden md:inline-block"
               }`}
             >
               {item.label}

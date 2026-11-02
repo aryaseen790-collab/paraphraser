@@ -14,6 +14,13 @@ const STYLES = [
     after: "Since half the team will be away on Wednesday, we’ve pushed the meeting to Thursday.",
   },
   {
+    name: "Humanize",
+    href: "/humanize-ai",
+    text: "For drafts that sound machine-made. It loosens the rhythm, cuts the stock phrases and swaps buzzwords for plain ones, so the text reads like a person wrote it.",
+    before: "In today’s fast-paced world, it is important to note that effective communication plays a crucial role in fostering success.",
+    after: "Clear communication goes a long way towards success.",
+  },
+  {
     name: "Fluent",
     href: "/fluent-paraphraser",
     text: "For text that’s understandable but clunky. It smooths out awkward phrasing, fixes small grammar slips and cuts repetition. Very handy when you’re writing in a language that isn’t your first.",
@@ -140,7 +147,7 @@ export function HomeContent() {
       <Section
         id="styles"
         number="02 · Styles"
-        title="Seven styles, and when to reach for each"
+        title="Eight styles, and when to reach for each"
         lede={<p>Each style is a different set of instructions. Here’s what they do, with a real example of each.</p>}
       >
         <div className="grid gap-5 md:grid-cols-2">
@@ -165,17 +172,18 @@ export function HomeContent() {
               </div>
             </article>
           ))}
-          <article className="flex flex-col justify-between rounded-3xl bg-foreground p-6 text-background sm:p-7">
+          <article className="flex flex-col justify-between rounded-3xl bg-foreground p-6 text-background sm:p-7 md:col-span-2 md:flex-row md:items-end md:gap-10">
             <div>
               <h3 className="font-display text-2xl font-semibold">Not sure which one?</h3>
               <p className="mt-2 leading-relaxed opacity-75">
-                Run your text through Standard first. If it’s too casual, switch to Formal. If it’s too long, try
-                Shorten. Your text stays in the box while you switch, so trying another style takes one click.
+                Run your text through Standard first. If it’s too casual, switch to Formal; if it’s too long, try
+                Shorten; if it sounds like a machine wrote it, Humanize. Your text stays in the box while you switch, so
+                trying another style takes a single click.
               </p>
             </div>
             <Link
               href="#tool"
-              className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-on-accent transition hover:bg-accent-hover"
+              className="mt-6 inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-on-accent transition hover:bg-accent-hover"
             >
               Back to the tool ↑
             </Link>
@@ -184,7 +192,59 @@ export function HomeContent() {
       </Section>
 
       <Section
-        number="03 · Tips"
+        id="humanize"
+        number="03 · Humanize AI"
+        title={
+          <>
+            Humanize AI text without losing <span className="swash">your</span> voice
+          </>
+        }
+        lede={
+          <p>
+            Drafted something with ChatGPT or another assistant and it sounds a little too polished, a little too
+            pleased with itself? You’re not imagining it. Machine-written prose has a recognisable cadence, and readers
+            pick up on it long before they could explain why.
+          </p>
+        }
+      >
+        <div className="grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-start">
+          <div className="space-y-4 text-lg leading-relaxed text-muted">
+            <p>
+              Our built-in AI humanizer is the quickest way to fix that. Choose the Humanize style and it rewrites the
+              draft with the irregular rhythm, plain vocabulary and economy of a person who knows what they want to say.
+              It treats the job the way an AI to human text converter should: the ideas stay, the robotic delivery goes.
+            </p>
+            <p>
+              It’s free, it works in twelve languages including Tagalog, and it won’t pretend to be a magic trick. We
+              don’t promise to beat AI detectors, because no honest tool can. We promise writing that reads well, which
+              is the thing that actually matters to the person on the other end.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-border bg-surface p-6 sm:p-8">
+            <h3 className="font-display text-2xl font-semibold">Free AI humanizer</h3>
+            <p className="mt-2 leading-relaxed text-muted">
+              Make it sound human in one click, with examples, tips and an honest FAQ.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <Link
+                href="/humanize-ai"
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-on-accent transition hover:bg-accent-hover"
+              >
+                Open the AI humanizer →
+              </Link>
+              <Link
+                href="/humanize-ai-tagalog"
+                className="inline-flex items-center rounded-full border border-border px-5 py-2.5 font-medium transition hover:border-foreground"
+              >
+                Tagalog
+              </Link>
+            </div>
+          </div>
+        </div>
+      </Section>
+
+      <Section
+        number="04 · Tips"
         title="How to get a better rewrite"
         lede={<p>A few habits make a real difference to what comes back.</p>}
       >
@@ -201,11 +261,11 @@ export function HomeContent() {
 
       <Section
         id="languages"
-        number="04 · Languages"
+        number="05 · Languages"
         title="Write in the language you think in"
         lede={
           <p>
-            Write in English, Urdu, Arabic, Hindi, Spanish, French, German, Portuguese, Indonesian, Turkish or Bengali,
+            Write in English, Filipino, Urdu, Arabic, Hindi, Spanish, French, German, Portuguese, Indonesian, Turkish or Bengali,
             and leave the output language on “Same as input”. The rewrite comes back in the language you wrote in, in
             the right script and direction, so Urdu and Arabic read right to left as they should.
           </p>
@@ -237,7 +297,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section number="05 · Who it’s for" title="Built for everyday writing">
+      <Section number="06 · Who it’s for" title="Built for everyday writing">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {AUDIENCES.map((a) => (
             <div key={a.title} className="rounded-3xl border border-border bg-surface p-6">
@@ -248,7 +308,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section number="06 · Fair use" title="Use it honestly">
+      <Section number="07 · Fair use" title="Use it honestly">
         <div className="grid gap-8 md:grid-cols-2">
           <blockquote className="self-start border-l-4 border-accent pl-6 font-display text-2xl leading-snug italic">
             A rewritten sentence is still somebody’s idea. If the idea wasn’t yours, it needs a citation, however
@@ -271,7 +331,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section number="07 · Privacy" title="Your words, kept out of sight">
+      <Section number="08 · Privacy" title="Your words, kept out of sight">
         <div className="max-w-3xl space-y-4 text-lg leading-relaxed text-muted">
           <p>
             We don’t ask who you are, and there’s nothing to sign up for. Your text is sent to the AI model only to
@@ -296,7 +356,7 @@ export function HomeContent() {
         </div>
       </Section>
 
-      <Section number="08 · Questions" title="Frequently asked questions">
+      <Section number="09 · Questions" title="Frequently asked questions">
         <Faq />
       </Section>
 

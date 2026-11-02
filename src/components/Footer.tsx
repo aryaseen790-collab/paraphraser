@@ -38,7 +38,14 @@ export function Footer() {
             A free tool for rewording your own writing. No account, no credit counter, and nothing to install.
           </p>
         </div>
-        <Column title="Styles" links={MODE_PAGES.map((p) => ({ href: `/${p.slug}`, label: p.h1 }))} />
+        <Column
+          title="Tools"
+          links={[
+            { href: "/humanize-ai", label: "AI Humanizer" },
+            { href: "/humanize-ai-tagalog", label: "Tagalog Humanizer" },
+            ...MODE_PAGES.map((p) => ({ href: `/${p.slug}`, label: p.h1 })),
+          ]}
+        />
         <Column title="Languages" links={LANGUAGE_PAGES.slice(0, 7).map((p) => ({ href: `/${p.slug}`, label: p.h1.replace(" Paraphrasing Tool", "") }))} />
         <Column title="Company" links={company} />
       </div>

@@ -1,4 +1,4 @@
-export type ModeId = "standard" | "fluent" | "formal" | "simple" | "creative" | "shorten" | "expand";
+export type ModeId = "standard" | "humanize" | "fluent" | "formal" | "simple" | "creative" | "shorten" | "expand";
 
 export interface Mode {
   id: ModeId;
@@ -19,6 +19,14 @@ export const MODES: Mode[] = [
     instruction:
       "Style: Standard. Reword the text using different vocabulary and sentence structures while keeping a similar length and a neutral tone.",
     outputScale: 1,
+  },
+  {
+    id: "humanize",
+    label: "Humanize",
+    hint: "Natural, human-sounding",
+    instruction:
+      "Style: Humanize. The text may sound stiff, generic or machine-written. Rewrite it so it reads as if a thoughtful person wrote it in a natural voice: vary sentence length and rhythm, prefer plain and specific words over buzzwords, remove filler and stock phrases (such as \"in today's fast-paced world\", \"delve into\", \"it is important to note that\", \"in conclusion\"), use contractions where they sound natural, and avoid overly symmetrical lists or headings that were not needed. Keep the meaning, every fact and roughly the same length.",
+    outputScale: 1.1,
   },
   {
     id: "fluent",

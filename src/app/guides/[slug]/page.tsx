@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContentPage } from "@/components/ContentPage";
+import { siteConfig } from "@/config/site";
 import { GUIDES, getGuide } from "@/content/guides";
 
 export function generateStaticParams() {
@@ -25,8 +26,18 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
   const guide = getGuide(slug);
   if (!guide) notFound();
 
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: guide.title,
+    description: guide.description,
+    mainEntityOfPage: `${siteConfig.url}/guides/${guide.slug}`,
+    publisher: { "@type": "Organization", name: siteConfig.name },
+  };
+
   return (
     <ContentPage>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
       <p className="text-sm">
         <Link href="/guides">← All guides</Link>
       </p>

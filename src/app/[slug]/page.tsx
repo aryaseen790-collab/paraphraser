@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { HUMANIZE_FAQS, HumanizeContent } from "@/components/HumanizeContent";
+import { HumanizeTagalogContent, TAGALOG_FAQS } from "@/components/HumanizeTagalogContent";
 import { ToolPage } from "@/components/ToolPage";
 import { LANDING_PAGES, getLandingPage } from "@/config/landing";
 
@@ -25,16 +27,29 @@ export default async function LandingPage({ params }: PageProps<"/[slug]">) {
   const page = getLandingPage(slug);
   if (!page) notFound();
 
+  const custom =
+    page.content === "humanize"
+      ? { children: <HumanizeContent />, faqs: HUMANIZE_FAQS }
+      : page.content === "humanize-tagalog"
+        ? { children: <HumanizeTagalogContent />, faqs: TAGALOG_FAQS }
+        : {};
+
   return (
     <ToolPage
       h1={page.h1}
       name={page.h1}
-      eyebrow={page.language ? "Free paraphrasing tool · " + page.h1.replace(" Paraphrasing Tool", "") : "Free paraphrasing tool · " + (page.mode ? page.mode[0].toUpperCase() + page.mode.slice(1) : "") + " style"}
+      eyebrow={
+        page.eyebrow ??
+        (page.language
+          ? "Free paraphrasing tool · " + page.h1.replace(" Paraphrasing Tool", "")
+          : "Free paraphrasing tool · " + (page.mode ? page.mode[0].toUpperCase() + page.mode.slice(1) : "") + " style")
+      }
       intro={page.intro}
       native={page.native}
       mode={page.mode}
       language={page.language}
       slug={page.slug}
+      {...custom}
     />
   );
 }

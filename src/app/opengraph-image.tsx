@@ -42,7 +42,7 @@ export default function OpengraphImage() {
           The free paraphrasing tool for&nbsp;<span style={{ color: "#c2410c", fontStyle: "italic" }}>clearer</span>&nbsp;writing
         </div>
         <div style={{ marginTop: 24, fontSize: 34, color: "#6b655c" }}>
-          Seven styles · Many languages · No sign-up
+          Paraphraser + AI humanizer · 12 languages · No sign-up
         </div>
       </div>
     ),
