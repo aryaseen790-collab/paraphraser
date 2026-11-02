@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe("estimateCostUsd", () => {
   it("uses the configured per-million prices", () => {
-    expect(estimateCostUsd(1_000_000, 0)).toBeCloseTo(0.1);
+    expect(estimateCostUsd(1_000_000, 0)).toBeCloseTo(0.1); // Claude by default
     expect(estimateCostUsd(0, 1_000_000)).toBeCloseTo(0.5);
     expect(estimateCostUsd(600, 600)).toBeCloseTo(0.00036);
   });

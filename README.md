@@ -1,8 +1,22 @@
 # Paraphraser: a free AI paraphrasing website
 
-A free paraphrasing site powered by **Claude Haiku 5.5** (`claude-haiku-5-5`). It feels unlimited to normal users (no sign-up, no credit counter) while invisible guardrails keep the API bill under a hard cap.
+A free paraphrasing site powered by **Claude Haiku 5.5** (`claude-haiku-5-5`) or **Google Gemini** (free tier), switchable with one setting. It feels unlimited to normal users (no sign-up, no credit counter) while invisible guardrails keep the API bill under a hard cap.
 
-**Stack:** Next.js 16 (App Router, TypeScript) · Tailwind CSS v4 · Anthropic TypeScript SDK · Upstash Redis · Cloudflare Turnstile · Vercel
+**Stack:** Next.js 16 (App Router, TypeScript) · Tailwind CSS v4 · Anthropic TypeScript SDK · Google Gen AI SDK · Upstash Redis · Cloudflare Turnstile · Vercel
+
+## Choosing the AI model
+
+Set `AI_PROVIDER` (and the matching key) in your environment, then redeploy:
+
+| `AI_PROVIDER` | What happens | Keys needed |
+|---|---|---|
+| `claude` (default) | Claude Haiku for every request. About $0.36 per 1,000 rewrites. | `ANTHROPIC_API_KEY` |
+| `gemini` | Gemini only, on Google's free tier. When the free daily quota runs out, users see "high demand, try again later" until it resets. | `GEMINI_API_KEY` |
+| `gemini,claude` | **Recommended free-first setup:** Gemini first; if Gemini errors or its quota runs out, the same request goes to Claude automatically. Claude spend still stops at `DAILY_BUDGET_USD`, after which only Gemini is used. | both |
+
+- Get a Gemini key at [Google AI Studio](https://aistudio.google.com/apikey). The default model is `gemini-flash-lite-latest`; set `GEMINI_MODEL` to pin another one.
+- **Free-tier trade-offs:** Google's free tier has low per-minute and per-day request limits, and under Google's terms for unpaid services your users' text may be used to improve Google's products and seen by human reviewers. The Privacy page updates automatically to say so when Gemini is enabled. Check Google's current [pricing and limits](https://ai.google.dev/gemini-api/docs/pricing) and [terms](https://ai.google.dev/gemini-api/terms).
+- If you later enable billing on Google, set `GEMINI_INPUT_PRICE_PER_M` / `GEMINI_OUTPUT_PRICE_PER_M` so Gemini spend counts toward the daily budget.
 
 ## Features
 
@@ -22,17 +36,17 @@ The browser never talks to Claude. `POST /api/paraphrase` runs every check first
 
 | # | Guardrail | Where |
 |---|---|---|
-| 1 | Cheapest capable model, thinking off, low effort | `src/config/limits.ts`, route |
+| 1 | Cheap models (Claude Haiku, thinking off; or Gemini free tier) | `src/config/ai.ts`, `src/lib/ai/` |
 | 2 | ≤ 1,000 words and ≤ 12,000 characters, checked on the server | `src/lib/validate.ts` |
 | 3 | `max_tokens` ≈ 1.5× the input estimate, capped at 2,000 | `src/lib/prompt.ts` |
 | 4 | 30 requests/hour per IP (sliding window) | `src/config/protection.ts` |
 | 5 | Cloudflare Turnstile token verified on every request | `src/lib/turnstile.ts` |
 | 6 | Cache: SHA-256(text + style + language) → result for 7 days | `src/lib/cache-key.ts` |
-| 7 | Daily budget switch from real token usage → "high demand" message | `src/lib/budget.ts`, `src/config/pricing.ts` |
+| 7 | Daily budget switch from real token usage: paid models stop, free Gemini continues, else "high demand" message | `src/lib/budget.ts`, `src/config/pricing.ts` |
 | + | Monthly spend limit in the Claude Console (the hard backstop) | Console |
 | + | Build fails if a secret appears in browser files | `scripts/check-secrets.mjs` |
 
-In production the route **refuses to call Claude** if the Upstash or Turnstile keys are missing, so a forgotten env var can't remove the guardrails.
+In production the route **refuses to call the AI model** if the Upstash or Turnstile keys are missing, so a forgotten env var can't remove the guardrails.
 
 ### Cost model
 
@@ -72,9 +86,10 @@ Without Upstash/Turnstile keys, local dev uses an in-memory store and skips the 
 | File | What you can change |
 |---|---|
 | `.env.local` / Vercel env vars | Keys, site name/URL, contact email, daily budget, ads on/off |
-| `src/config/limits.ts` | Model, word/character caps, output-token caps |
+| `src/config/ai.ts` | Claude model, default Gemini model, provider order |
+| `src/config/limits.ts` | Word/character caps, output-token caps |
 | `src/config/protection.ts` | Rate limit, cache lifetime |
-| `src/config/pricing.ts` | Per-token prices used for the budget |
+| `src/config/pricing.ts` | Per-token prices used for the budget (Gemini = 0 on the free tier) |
 | `src/config/modes.ts` | The seven styles and their instructions to Claude |
 | `src/config/languages.ts` | The language dropdown |
 | `src/config/landing.ts` | SEO landing pages (slug, title, H1, intro) |
@@ -85,13 +100,14 @@ Without Upstash/Turnstile keys, local dev uses an in-memory store and skips the 
 ```
 src/
   app/
-    api/paraphrase/route.ts   the only place that calls Claude (all checks live here)
+    api/paraphrase/route.ts   the only place that calls the AI model (all checks live here)
     [slug]/page.tsx           SEO landing pages
     guides/                   how-to articles
     about, privacy, terms, contact/
     sitemap.ts, robots.ts, opengraph-image.tsx, icon.svg
   components/                 Paraphraser (the tool), ToolPage, AdSlot, theme, header/footer
   config/                     editable settings (see above)
+  lib/ai/                     Claude and Gemini providers + fallback chain
   lib/                        prompt building, validation, store (Redis), budget, Turnstile, diff
 scripts/check-secrets.mjs     fails the build if a secret leaks into browser files
 tests/                        unit tests

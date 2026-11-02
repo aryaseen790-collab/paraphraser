@@ -1,8 +1,6 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { MODEL } from "@/config/limits";
-import { estimateCostUsd } from "@/config/pricing";
+import { estimateCostUsd, isFreeProvider } from "@/config/pricing";
 import { CACHE_TTL_SECONDS, MAX_BODY_BYTES } from "@/config/protection";
-import { getAnthropic } from "@/lib/anthropic";
+import { ProviderBusyError, getProviderChain, type ProviderId } from "@/lib/ai";
 import { isOverBudget, recordSpend, recordStats } from "@/lib/budget";
 import { paraphraseCacheKey } from "@/lib/cache-key";
 import { getClientIp } from "@/lib/ip";
@@ -33,7 +31,7 @@ function jsonError(message: string, status: number, headers?: Record<string, str
   return Response.json({ error: message }, { status, headers: { "Cache-Control": "no-store", ...headers } });
 }
 
-/** Every check below runs before Claude is called, so a rejected request costs nothing. */
+/** Every check below runs before the AI model is called, so a rejected request costs nothing. */
 export async function POST(request: Request) {
   // 1. Size and shape of the input.
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
@@ -54,7 +52,13 @@ export async function POST(request: Request) {
 
   const store = getStore();
   if (!store) {
-    console.error("[paraphrase] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not set; refusing to call Claude.");
+    console.error("[paraphrase] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not set; refusing to call the AI model.");
+    return jsonError(MESSAGES.generic, 503);
+  }
+
+  let providers = getProviderChain();
+  if (providers.length === 0) {
+    console.error("[paraphrase] No AI provider configured: set AI_PROVIDER and its API key (ANTHROPIC_API_KEY / GEMINI_API_KEY).");
     return jsonError(MESSAGES.generic, 503);
   }
 
@@ -74,7 +78,7 @@ export async function POST(request: Request) {
     const turnstile = await verifyTurnstile(turnstileToken, ip);
     if (!turnstile.ok) {
       if (turnstile.reason === "not-configured") {
-        console.error("[paraphrase] TURNSTILE_SECRET_KEY is not set; refusing to call Claude.");
+        console.error("[paraphrase] TURNSTILE_SECRET_KEY is not set; refusing to call the AI model.");
         return jsonError(MESSAGES.generic, 503);
       }
       void recordStats(store, { botBlocked: 1 }).catch(() => {});
@@ -88,42 +92,34 @@ export async function POST(request: Request) {
       return new Response(cached, { headers: { ...STREAM_HEADERS, "X-Cache": "HIT" } });
     }
 
-    // 5. Daily budget switch.
+    // 5. Daily budget switch: once today's spend reaches DAILY_BUDGET_USD,
+    // only free providers (e.g. Gemini's free tier) may still be used.
     if (await isOverBudget(store)) {
-      void recordStats(store, { budgetBlocked: 1 }).catch(() => {});
-      return jsonError(MESSAGES.highDemand, 503, { "Retry-After": "600" });
+      providers = providers.filter((p) => isFreeProvider(p.id));
+      if (providers.length === 0) {
+        void recordStats(store, { budgetBlocked: 1 }).catch(() => {});
+        return jsonError(MESSAGES.highDemand, 503, { "Retry-After": "600" });
+      }
     }
   } catch (err) {
     console.error("[paraphrase] protection check failed:", err);
     return jsonError(MESSAGES.generic, 503);
   }
 
-  let anthropic: Anthropic;
-  try {
-    anthropic = getAnthropic();
-  } catch (err) {
-    console.error("[paraphrase] configuration error:", err);
-    return jsonError(MESSAGES.generic, 503);
-  }
-
-  // 6. Call Claude and stream the answer.
+  // 6. Call the AI model and stream the answer.
   const encoder = new TextEncoder();
-  const params: Anthropic.MessageStreamParams = {
-    model: MODEL,
-    max_tokens: computeMaxTokens(text, mode),
-    // Paraphrasing needs no reasoning: skip thinking for speed and cost.
-    thinking: { type: "disabled" },
-    output_config: { effort: "low" },
+  const call = {
     system: buildSystemPrompt(mode, language),
-    messages: [{ role: "user", content: buildUserMessage(text) }],
+    user: buildUserMessage(text),
+    maxTokens: computeMaxTokens(text, mode),
+    signal: request.signal,
   };
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       let output = "";
-      let inputTokens = 0;
-      let outputTokens = 0;
       let completed = false;
+      const usage: Usage[] = [];
 
       const send = (chunk: string) => {
         try {
@@ -134,45 +130,42 @@ export async function POST(request: Request) {
       };
 
       try {
-        const claudeStream = anthropic.messages.stream(params, { signal: request.signal });
-
-        for await (const event of claudeStream) {
-          if (event.type === "message_start") {
-            inputTokens = event.message.usage.input_tokens;
-          } else if (event.type === "message_delta") {
-            outputTokens = event.usage.output_tokens;
-          } else if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-            output += event.delta.text;
-            send(event.delta.text);
+        for (let i = 0; i < providers.length; i++) {
+          const provider = providers[i];
+          const isLast = i === providers.length - 1;
+          const used: Usage = { provider: provider.id, inputTokens: 0, outputTokens: 0 };
+          usage.push(used);
+          try {
+            for await (const event of provider.stream(call)) {
+              if (event.type === "text") {
+                output += event.text;
+                send(event.text);
+              } else {
+                used.inputTokens = event.inputTokens;
+                used.outputTokens = event.outputTokens;
+                if (event.stopReason === "refusal") send(encodeControl({ error: MESSAGES.refusal }));
+                else if (event.stopReason === "max_tokens") send(encodeControl({ notice: MESSAGES.truncated }));
+                else if (output.trim()) completed = true;
+              }
+            }
+            break;
+          } catch (err) {
+            if (request.signal.aborted) break;
+            // Estimate tokens for a stream that died part-way, so spend is still counted.
+            if (used.outputTokens === 0 && output) used.outputTokens = Math.ceil(output.length / 3);
+            if (output || isLast) {
+              // Text already reached the user (can't switch models mid-answer), or nothing left to try.
+              console.error(`[paraphrase] ${provider.label} request failed:`, err);
+              send(encodeControl({ error: err instanceof ProviderBusyError && !output ? MESSAGES.highDemand : MESSAGES.generic }));
+              break;
+            }
+            console.warn(`[paraphrase] ${provider.label} failed before answering; trying ${providers[i + 1].label}.`, err);
           }
-        }
-
-        const final = await claudeStream.finalMessage();
-        inputTokens = final.usage.input_tokens;
-        outputTokens = final.usage.output_tokens;
-
-        if (final.stop_reason === "refusal") {
-          send(encodeControl({ error: MESSAGES.refusal }));
-        } else if (final.stop_reason === "max_tokens") {
-          send(encodeControl({ notice: MESSAGES.truncated }));
-        } else if (output.trim()) {
-          completed = true;
-        }
-      } catch (err) {
-        if (!request.signal.aborted) {
-          console.error("[paraphrase] Claude request failed:", err);
-          send(encodeControl({ error: MESSAGES.generic }));
         }
       } finally {
         // Record spend and cache the result before closing the stream: on
         // serverless hosts the function may be frozen as soon as the response ends.
-        if (outputTokens === 0 && output) outputTokens = Math.ceil(output.length / 3);
-        await finishBookkeeping(store, {
-          cacheKey,
-          output: completed ? output : null,
-          inputTokens,
-          outputTokens,
-        });
+        await finishBookkeeping(store, { cacheKey, output: completed ? output : null, usage });
         try {
           controller.close();
         } catch {
@@ -185,20 +178,27 @@ export async function POST(request: Request) {
   return new Response(stream, { headers: { ...STREAM_HEADERS, "X-Cache": "MISS" } });
 }
 
+interface Usage {
+  provider: ProviderId;
+  inputTokens: number;
+  outputTokens: number;
+}
+
 async function finishBookkeeping(
   store: Store,
-  data: { cacheKey: string; output: string | null; inputTokens: number; outputTokens: number },
+  data: { cacheKey: string; output: string | null; usage: Usage[] },
 ) {
   try {
-    const cost = estimateCostUsd(data.inputTokens, data.outputTokens);
+    const cost = data.usage.reduce((sum, u) => sum + estimateCostUsd(u.inputTokens, u.outputTokens, u.provider), 0);
+    const counters: Record<string, number> = { requests: 1 };
+    for (const u of data.usage) {
+      counters[`calls_${u.provider}`] = (counters[`calls_${u.provider}`] ?? 0) + 1;
+      counters[`inputTokens_${u.provider}`] = (counters[`inputTokens_${u.provider}`] ?? 0) + u.inputTokens;
+      counters[`outputTokens_${u.provider}`] = (counters[`outputTokens_${u.provider}`] ?? 0) + u.outputTokens;
+    }
     await Promise.all([
       recordSpend(store, cost),
-      recordStats(store, {
-        requests: 1,
-        claudeCalls: 1,
-        inputTokens: data.inputTokens,
-        outputTokens: data.outputTokens,
-      }),
+      recordStats(store, counters),
       data.output !== null ? store.setString(data.cacheKey, data.output, CACHE_TTL_SECONDS) : Promise.resolve(),
     ]);
   } catch (err) {

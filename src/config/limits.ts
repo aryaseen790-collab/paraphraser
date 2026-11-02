@@ -1,8 +1,5 @@
 /** Hard limits. These are enforced on the server; the browser only mirrors them. */
 
-/** Claude model used for every paraphrase. Haiku is the cheapest capable model. */
-export const MODEL = "claude-haiku-5-5";
-
 /** Maximum words per request (free tier). */
 export const MAX_WORDS = 1000;
 

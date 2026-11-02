@@ -19,9 +19,9 @@ for (const file of [".env.local", ".env"]) {
   }
 }
 
-const SECRET_VARS = ["ANTHROPIC_API_KEY", "UPSTASH_REDIS_REST_TOKEN", "TURNSTILE_SECRET_KEY"];
+const SECRET_VARS = ["ANTHROPIC_API_KEY", "GEMINI_API_KEY", "UPSTASH_REDIS_REST_TOKEN", "TURNSTILE_SECRET_KEY"];
 const needles = SECRET_VARS.map((name) => [name, process.env[name]]).filter(([, v]) => v && v.length >= 8);
-const PATTERNS = [/sk-ant-[A-Za-z0-9_-]{8,}/];
+const PATTERNS = [/sk-ant-[A-Za-z0-9_-]{8,}/, /AIza[0-9A-Za-z_-]{35}/];
 
 const targets = [
   { dir: path.join(root, ".next", "static"), exts: null },

@@ -7,6 +7,7 @@ This guide takes the site from your laptop to `https://yourdomain.com` on Vercel
 | Service | What to do | Env vars it gives you |
 |---|---|---|
 | **Claude Console** (console.anthropic.com) | Add billing, create an API key, and **set a monthly spend limit** (Settings → Limits). This is the hard cap behind the code's daily budget. | `ANTHROPIC_API_KEY` |
+| **Google AI Studio** (aistudio.google.com/apikey), *optional* | Create a Gemini API key for the free tier. Only needed if `AI_PROVIDER` includes `gemini`. | `GEMINI_API_KEY` |
 | **Upstash** (upstash.com) | Create a Redis database (free tier, region close to your Vercel region, e.g. `us-east-1`). Open it and copy the REST URL and token. | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 | **Cloudflare Turnstile** (dash.cloudflare.com → Turnstile) | Add a widget. Widget mode: **Invisible** (or Managed). Hostnames: your domain, plus `localhost` while testing. | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
 | **GitHub** | Push this repository. | |
@@ -33,7 +34,8 @@ npm run build     # production build + automatic secret-leak check
 
 1. **Vercel → Add New → Project → Import** your GitHub repository. The framework is detected as Next.js; keep the default build settings.
 2. Under **Environment Variables**, add every key from `.env.example` for the *Production* (and *Preview*) environment:
-   - `ANTHROPIC_API_KEY`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `TURNSTILE_SECRET_KEY`, `DAILY_BUDGET_USD`
+   - `AI_PROVIDER` (`claude`, `gemini`, or `gemini,claude`; see the README) and the matching `ANTHROPIC_API_KEY` and/or `GEMINI_API_KEY`
+   - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `TURNSTILE_SECRET_KEY`, `DAILY_BUDGET_USD`
    - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `NEXT_PUBLIC_SITE_NAME`, `NEXT_PUBLIC_SITE_URL` (your final `https://` domain), `NEXT_PUBLIC_CONTACT_EMAIL`
    - `NEXT_PUBLIC_ADS_ENABLED=false` for now
    - **Do not** set `ALLOW_DEV_FALLBACKS` in production.
@@ -71,9 +73,9 @@ npm run build     # production build + automatic secret-leak check
 # Pre-launch checklist
 
 **Security (do this first)**
-- [ ] Open the live site in Chrome → **View Page Source** and search for `sk-ant`: no results.
+- [ ] Open the live site in Chrome → **View Page Source** and search for `sk-ant` and `AIza`: no results.
 - [ ] DevTools → **Network** → press Paraphrase → open the `/api/paraphrase` request: the request has only `text`, `mode`, `language`, `turnstileToken`, and no key appears in any header or response.
-- [ ] DevTools → **Sources**: search all files (Ctrl/Cmd+Shift+F) for `sk-ant` and for your Upstash token: no results.
+- [ ] DevTools → **Sources**: search all files (Ctrl/Cmd+Shift+F) for `sk-ant`, `AIza` and your Upstash token: no results.
 - [ ] The Vercel build log shows `✓ check-secrets: … no secrets found`.
 - [ ] `.env.local` is **not** in GitHub (it's git-ignored).
 
@@ -98,5 +100,5 @@ npm run build     # production build + automatic secret-leak check
 - [ ] Share a link in WhatsApp/Slack: the preview image and title appear.
 
 **After week one**
-- [ ] In the Upstash data browser, open `stats:YYYY-MM-DD` keys: divide spend (`spend:YYYY-MM-DD`, micro-dollars) by `claudeCalls` to get the real cost per request, and look at `cacheHits`, `rateLimited`, `botBlocked`, `budgetBlocked`.
+- [ ] In the Upstash data browser, open `stats:YYYY-MM-DD` keys: `calls_claude` / `calls_gemini` show which model served requests (Gemini calls that fell back to Claude count for both). Divide spend (`spend:YYYY-MM-DD`, micro-dollars) by `calls_claude` for the real Claude cost per request, and look at `cacheHits`, `rateLimited`, `botBlocked`, `budgetBlocked`.
 - [ ] Compare with the Claude Console usage page, then adjust `DAILY_BUDGET_USD` and the limits in `src/config/`.

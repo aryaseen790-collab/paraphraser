@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentPage } from "@/components/ContentPage";
+import { usesClaude, usesGemini } from "@/config/ai";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
+  const claude = usesClaude();
+  const gemini = usesGemini();
   return (
     <ContentPage>
       <h1>Privacy Policy</h1>
@@ -20,18 +23,34 @@ export default function PrivacyPage() {
 
       <h2>The text you paraphrase</h2>
       <ul>
-        <li>Your text is sent over an encrypted connection to our server and then to our AI provider, Anthropic, only to generate the rewrite.</li>
+        <li>
+          Your text is sent over an encrypted connection to our server and then to our AI provider
+          {claude && gemini ? "s (Google Gemini, with Anthropic Claude as a backup)" : gemini ? ", Google (Gemini)" : ", Anthropic (Claude)"}{" "}
+          only to generate the rewrite.
+        </li>
         <li>
           To return repeat requests instantly and keep the service free, the <strong>rewritten result</strong> of a request
           is cached for up to <strong>7 days</strong>. It is stored under a one-way SHA-256 hash of your text, style and
           language; we do not keep a readable copy of your original text, and the cache is not linked to you.
         </li>
-        <li>We do not sell your text, use it for advertising profiles, or use it to train AI models.</li>
-        <li>
-          Anthropic processes requests under its commercial terms and may retain API data for a limited period for
-          safety and abuse monitoring. See{" "}
-          <a href="https://www.anthropic.com/legal/privacy" rel="noopener noreferrer" target="_blank">Anthropic&apos;s privacy policy</a>.
-        </li>
+        <li>We do not sell your text or use it for advertising profiles.</li>
+        {claude && (
+          <li>
+            Anthropic processes requests under its commercial terms, does not use them to train its models, and may
+            retain API data for a limited period for safety and abuse monitoring. See{" "}
+            <a href="https://www.anthropic.com/legal/privacy" rel="noopener noreferrer" target="_blank">Anthropic&apos;s privacy policy</a>.
+          </li>
+        )}
+        {gemini && (
+          <li>
+            <strong>Google Gemini:</strong> we may use Google&apos;s free Gemini API tier. Under Google&apos;s terms for
+            unpaid services, Google may use submitted text and responses to provide, improve and develop its products,
+            and human reviewers may read them. See the{" "}
+            <a href="https://ai.google.dev/gemini-api/terms" rel="noopener noreferrer" target="_blank">Gemini API terms</a>{" "}
+            and{" "}
+            <a href="https://policies.google.com/privacy" rel="noopener noreferrer" target="_blank">Google&apos;s privacy policy</a>.
+          </li>
+        )}
         <li>Please do not paste passwords, financial details or other sensitive personal information.</li>
       </ul>
 
