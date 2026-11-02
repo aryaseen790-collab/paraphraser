@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "Which languages are supported?",
-    a: "English, Urdu, Arabic, Hindi, Spanish, French, German, Portuguese, Indonesian, Turkish, Bengali and more. Leave the language on Auto-detect to keep the same language as your input, or pick one to rewrite into it.",
+    a: "English, Urdu, Arabic, Hindi, Spanish, French, German, Portuguese, Indonesian, Turkish, Bengali and more. Leave the output language on \"Same as input\" to keep the language of your text, or pick one to rewrite into it.",
   },
   {
     q: "Can I use it for school or work?",

@@ -9,7 +9,7 @@ export interface Language {
 export const AUTO_LANGUAGE = "auto";
 
 export const LANGUAGES: Language[] = [
-  { id: AUTO_LANGUAGE, name: "Auto-detect", label: "Auto-detect (same as input)" },
+  { id: AUTO_LANGUAGE, name: "Auto-detect", label: "Same as input" },
   { id: "en", name: "English", label: "English" },
   { id: "ur", name: "Urdu", label: "Urdu (اردو)" },
   { id: "ar", name: "Arabic", label: "Arabic (العربية)" },

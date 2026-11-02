@@ -171,8 +171,8 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
   return (
     <section aria-label="Paraphrasing tool" className="rounded-2xl border border-border bg-surface shadow-sm">
       {/* Controls */}
-      <div className="flex flex-col gap-3 border-b border-border p-3 sm:p-4 lg:flex-row lg:items-center lg:justify-between">
-        <div role="radiogroup" aria-label="Style" className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 lg:flex-wrap lg:overflow-visible lg:pb-0">
+      <div className="flex flex-col gap-3 border-b border-border p-3 sm:p-4 xl:flex-row xl:items-center xl:justify-between">
+        <div role="radiogroup" aria-label="Style" className="-mx-1 flex min-w-0 gap-1.5 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible md:pb-0">
           {MODES.map((m) => (
             <button
               key={m.id}
@@ -191,12 +191,12 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
             </button>
           ))}
         </div>
-        <label className="flex items-center gap-2 text-sm text-muted">
+        <label className="flex min-w-0 items-center gap-2 text-sm text-muted">
           <span className="shrink-0">Output language</span>
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-foreground lg:w-auto"
+            className="w-full min-w-0 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-foreground md:w-auto xl:max-w-64"
           >
             {LANGUAGES.map((l) => (
               <option key={l.id} value={l.id}>
