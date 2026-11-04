@@ -10,5 +10,11 @@ export const siteConfig = {
     "Humanize AI text free with OG Humanizer. Turn stiff, robotic drafts into natural writing that sounds like you, plus a free paraphraser. No sign-up.",
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@oghumanizer.com",
   adsEnabled: process.env.NEXT_PUBLIC_ADS_ENABLED === "true",
+  /**
+   * Search engines may index the site only when ALLOW_INDEXING=true. Until then
+   * every page says "noindex, nofollow" (meta tag + X-Robots-Tag header) and the
+   * sitemap is not advertised. Changing it requires a redeploy.
+   */
+  indexable: process.env.ALLOW_INDEXING === "true",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",
 } as const;

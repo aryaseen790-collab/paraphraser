@@ -58,12 +58,20 @@ npm run build     # production build + automatic secret-leak check
 >
 > **Primary domain:** make `oghumanizer.com` serve Production and set `www.oghumanizer.com` to redirect to it, so the canonical URLs the site declares never point at a redirect.
 
-## 5. Search Console and analytics
+## 5. Launching: allow search engines
+
+The site ships **hidden from search engines** by default: every page sends `noindex, nofollow` (meta tag and `X-Robots-Tag` header) and robots.txt doesn't list the sitemap. When you're ready to go public:
+
+1. Vercel → Settings → Environment Variables → add `ALLOW_INDEXING` = `true` (type Config).
+2. Redeploy.
+3. Check: View Page Source on the home page shows `<meta name="robots" content="index, follow"/>`, and `/robots.txt` ends with the `Sitemap:` line.
+
+## 6. Search Console and analytics
 
 1. **Google Search Console** → Add property → Domain → verify with the DNS TXT record → **Sitemaps** → submit `https://oghumanizer.com/sitemap.xml`.
 2. **Analytics:** Vercel Web Analytics (one click in the dashboard), Plausible, or Google Analytics. If you add a cookie-based tool or ads and have EU/UK visitors, add a consent banner.
 
-## 6. Turning on ads (later)
+## 7. Turning on ads (later)
 
 1. Apply for **Google AdSense** once the site has real content and some traffic.
 2. When approved, set `NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-…` and `NEXT_PUBLIC_ADS_ENABLED=true`, then redeploy.
@@ -97,6 +105,7 @@ npm run build     # production build + automatic secret-leak check
 - [ ] About, Privacy, Terms and Contact pages have your real details (replace `hello@example.com`); legal text reviewed for your country.
 
 **SEO**
+- [ ] `ALLOW_INDEXING=true` is set and the site was redeployed (otherwise Google is told not to index anything).
 - [ ] `https://oghumanizer.com/sitemap.xml` and `/robots.txt` load and show your real domain.
 - [ ] Sitemap submitted in Google Search Console.
 - [ ] Share a link in WhatsApp/Slack: the preview image and title appear.

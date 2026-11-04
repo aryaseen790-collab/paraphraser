@@ -38,7 +38,9 @@ export const metadata: Metadata = {
     title: `Humanize AI Text Free: AI Humanizer | ${siteConfig.name}`,
     description: siteConfig.description,
   },
-  robots: { index: true, follow: true },
+  robots: siteConfig.indexable
+    ? { index: true, follow: true }
+    : { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
 };
 
 export const viewport: Viewport = {

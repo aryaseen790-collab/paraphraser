@@ -29,7 +29,13 @@ const nextConfig: NextConfig = {
     return [{ source: "/humanize-ai", destination: "/", permanent: true }];
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    const headers = [...securityHeaders];
+    // Pre-launch: tell search engines not to index anything, including non-HTML
+    // files. Set ALLOW_INDEXING=true (and redeploy) to launch.
+    if (process.env.ALLOW_INDEXING !== "true") {
+      headers.push({ key: "X-Robots-Tag", value: "noindex, nofollow" });
+    }
+    return [{ source: "/:path*", headers }];
   },
 };
 
