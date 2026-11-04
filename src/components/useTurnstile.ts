@@ -37,7 +37,7 @@ function loadScript(): Promise<void> {
   return scriptPromise;
 }
 
-type Waiter = (token: string) => void;
+type Waiter = { resolve: (token: string) => void; reject: (err: Error) => void };
 
 /**
  * Invisible Cloudflare Turnstile that always keeps one fresh token ready.
@@ -76,7 +76,7 @@ export function useTurnstile(siteKey: string | undefined) {
             const waiter = waiters.current.shift();
             if (waiter) {
               // Someone is already waiting: hand it over and start on the next one.
-              waiter(t);
+              waiter.resolve(t);
               if (widgetId.current) window.turnstile?.reset(widgetId.current);
             } else {
               token.current = t;
@@ -85,9 +85,18 @@ export function useTurnstile(siteKey: string | undefined) {
           "expired-callback": () => {
             token.current = null;
           },
-          "error-callback": () => {
+          "error-callback": (code: string) => {
             token.current = null;
-            // Returning nothing lets Turnstile retry automatically.
+            // 110xxx codes are configuration errors (e.g. 110200: this domain is not
+            // in the widget's hostname list). Retrying can't fix them, so fail fast.
+            if (String(code).startsWith("110")) {
+              console.error(`[turnstile] configuration error ${code}: check the widget's hostnames and site key in Cloudflare.`);
+              const pending = waiters.current;
+              waiters.current = [];
+              pending.forEach((w) => w.reject(new Error(`Turnstile error ${code}`)));
+              return true;
+            }
+            // Other errors: returning nothing lets Turnstile retry automatically.
           },
         });
       })
@@ -116,9 +125,15 @@ export function useTurnstile(siteKey: string | undefined) {
     }
 
     return new Promise<string>((resolve, reject) => {
-      const waiter: Waiter = (t) => {
-        clearTimeout(timer);
-        resolve(t);
+      const waiter: Waiter = {
+        resolve: (t) => {
+          clearTimeout(timer);
+          resolve(t);
+        },
+        reject: (err) => {
+          clearTimeout(timer);
+          reject(err);
+        },
       };
       const timer = setTimeout(() => {
         waiters.current = waiters.current.filter((w) => w !== waiter);
