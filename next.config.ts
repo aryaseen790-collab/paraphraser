@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  experimental: {
+    // Put the small Tailwind stylesheet straight into the HTML so the first paint
+    // doesn't wait for a second request.
+    inlineCss: true,
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -59,7 +59,7 @@
   --color-removed-bg: var(--removed-bg);
   --color-removed-fg: var(--removed-fg);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --font-display: var(--font-fraunces);
 }
 
@@ -114,10 +114,11 @@ body {
 .rise-3 {
   animation-delay: 0.16s;
 }
+/* Movement only, no fade: the headline is visible from the first frame, which
+   keeps First/Largest Contentful Paint and Speed Index fast. */
 @keyframes rise {
   from {
-    opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
