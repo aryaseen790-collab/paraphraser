@@ -244,8 +244,14 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                 ref={textareaRef}
                 dir="auto"
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                onFocus={() => setEditing(true)}
+                onChange={(e) => {
+                  setText(e.target.value);
+                  turnstile.activate();
+                }}
+                onFocus={() => {
+                  setEditing(true);
+                  turnstile.activate();
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
                     e.preventDefault();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface TurnstileApi {
   render(container: HTMLElement, options: Record<string, unknown>): string;
@@ -48,15 +48,22 @@ type Waiter = (token: string) => void;
  * the user reads the result. Most visitors never see anything; if Cloudflare
  * needs a click, the checkbox appears inside the container.
  * Without NEXT_PUBLIC_TURNSTILE_SITE_KEY (local dev) getToken() returns "".
+ *
+ * Nothing is loaded until activate() is called (the visitor starts typing) or a
+ * token is requested, so Cloudflare's script never slows down the first paint.
  */
 export function useTurnstile(siteKey: string | undefined) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const token = useRef<string | null>(null);
   const waiters = useRef<Waiter[]>([]);
+  const [active, setActive] = useState(false);
+
+  /** Start loading Turnstile in the background. Safe to call repeatedly. */
+  const activate = useCallback(() => setActive(true), []);
 
   useEffect(() => {
-    if (!siteKey) return;
+    if (!siteKey || !active) return;
     let cancelled = false;
     loadScript()
       .then(() => {
@@ -93,11 +100,12 @@ export function useTurnstile(siteKey: string | undefined) {
       widgetId.current = null;
       token.current = null;
     };
-  }, [siteKey]);
+  }, [siteKey, active]);
 
   /** Returns a fresh, never-used token (waiting for one if necessary). */
   const getToken = useCallback(async (): Promise<string> => {
     if (!siteKey) return "";
+    setActive(true);
     await loadScript();
 
     const ready = token.current;
@@ -120,5 +128,5 @@ export function useTurnstile(siteKey: string | undefined) {
     });
   }, [siteKey]);
 
-  return useMemo(() => ({ containerRef, getToken }), [getToken]);
+  return useMemo(() => ({ containerRef, getToken, activate }), [getToken, activate]);
 }
