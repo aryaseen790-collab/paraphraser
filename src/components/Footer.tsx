@@ -35,14 +35,15 @@ export function Footer() {
         <div className="max-w-xs">
           <Logo />
           <p className="mt-4 text-sm leading-relaxed text-muted">
-            A free tool for rewording your own writing. No account, no credit counter, and nothing to install.
+            OG as in original. A free AI humanizer and paraphraser that helps your writing sound like you. No account, no credit counter.
           </p>
         </div>
         <Column
           title="Tools"
           links={[
-            { href: "/humanize-ai", label: "AI Humanizer" },
+            { href: "/", label: "AI Humanizer" },
             { href: "/humanize-ai-tagalog", label: "Tagalog Humanizer" },
+            { href: "/paraphrasing-tool", label: "Paraphrasing Tool" },
             ...MODE_PAGES.map((p) => ({ href: `/${p.slug}`, label: p.h1 })),
           ]}
         />

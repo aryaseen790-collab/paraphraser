@@ -19,6 +19,10 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    // The humanizer now lives on the home page.
+    return [{ source: "/humanize-ai", destination: "/", permanent: true }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

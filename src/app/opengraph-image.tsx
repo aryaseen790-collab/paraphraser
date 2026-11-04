@@ -34,15 +34,15 @@ export default function OpengraphImage() {
               justifyContent: "center",
             }}
           >
-            p
+            OG
           </div>
           {siteConfig.name}
         </div>
         <div style={{ marginTop: 40, fontSize: 76, fontWeight: 800, lineHeight: 1.05, display: "flex", flexWrap: "wrap" }}>
-          The free paraphrasing tool for&nbsp;<span style={{ color: "#c2410c", fontStyle: "italic" }}>clearer</span>&nbsp;writing
+          Make AI text sound like&nbsp;<span style={{ color: "#c2410c", fontStyle: "italic" }}>you</span>.
         </div>
         <div style={{ marginTop: 24, fontSize: 34, color: "#6b655c" }}>
-          Paraphraser + AI humanizer · 12 languages · No sign-up
+          Free AI humanizer · 12 languages · No sign-up
         </div>
       </div>
     ),

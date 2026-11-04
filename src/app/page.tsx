@@ -1,18 +1,21 @@
-import { HomeContent } from "@/components/HomeContent";
+import { HUMANIZE_FAQS, HumanizeContent } from "@/components/HumanizeContent";
 import { ToolPage } from "@/components/ToolPage";
 
 export default function Home() {
   return (
     <ToolPage
-      name="Free Paraphrasing Tool"
+      name="Free AI Humanizer"
+      eyebrow="Free AI humanizer · No sign-up"
       h1={
         <>
-          The free paraphrasing tool for <span className="swash">clearer</span> writing
+          Humanize AI text so it sounds like <span className="swash">you</span>
         </>
       }
-      intro="Paste a sentence, a paragraph or a whole page, pick a style, and get a rewrite in seconds with every change highlighted. Need to humanize AI text? There’s a style for that too. No account, no credit counter, nothing to install."
+      intro="Paste a draft that reads like it came off a production line. OG Humanizer reworks the rhythm, trims the filler and swaps generic phrasing for plain, specific language, while your facts stay exactly where you left them."
+      mode="humanize"
+      faqs={HUMANIZE_FAQS}
     >
-      <HomeContent />
+      <HumanizeContent />
     </ToolPage>
   );
 }

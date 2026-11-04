@@ -100,7 +100,7 @@ export function HumanizeTagalogContent() {
           Students, freelancers and small businesses use it for school reflections, Facebook posts, customer replies and
           product listings. Whatever you write, use it on your own work and follow your school’s rules on AI. For English
           text, head to the main{" "}
-          <Link href="/humanize-ai" className="text-accent-text underline underline-offset-2">
+          <Link href="/" className="text-accent-text underline underline-offset-2">
             AI humanizer
           </Link>
           .

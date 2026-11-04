@@ -1,8 +1,11 @@
 import Link from "next/link";
-import type { FaqItem } from "@/content/faq";
+import { FAQS, type FaqItem } from "@/content/faq";
 import { Faq } from "./Faq";
+import { LanguageChips } from "./LanguageChips";
 import { MoreTools } from "./MoreTools";
 import { Section } from "./Section";
+
+const GENERAL = (q: string) => FAQS.find((f) => f.q === q)!;
 
 export const HUMANIZE_FAQS: FaqItem[] = [
   {
@@ -33,6 +36,9 @@ export const HUMANIZE_FAQS: FaqItem[] = [
     q: "Is it the best AI humanizer?",
     a: "That depends on what you need. If you want a free, quick way to make a draft sound natural without creating an account, it’s a very good fit. If you need long documents processed in bulk, a paid tool may suit you better. Try it on your own text and judge the result.",
   },
+  GENERAL("Why is there a 1,000-word limit?"),
+  GENERAL("Do you keep my text?"),
+  GENERAL("Does it work on my phone?"),
 ];
 
 const TELLS = [
@@ -86,7 +92,7 @@ const EXAMPLES = [
   },
 ];
 
-/** Long-form content for the /humanize-ai landing page. */
+/** Long-form content for the home page: the AI humanizer. */
 export function HumanizeContent() {
   return (
     <>
@@ -120,7 +126,36 @@ export function HumanizeContent() {
       </Section>
 
       <Section
-        number="02 · What changes"
+        number="02 · The name"
+        title={
+          <>
+            Why <span className="swash">OG</span>?
+          </>
+        }
+      >
+        <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-start">
+          <blockquote className="self-start border-l-4 border-accent pl-6 font-display text-2xl leading-snug italic">
+            OG stands for original. The aim is writing that sounds like the original version of you, not the average of
+            everything on the internet.
+          </blockquote>
+          <div className="space-y-4 text-lg leading-relaxed text-muted">
+            <p>
+              Every good piece of writing starts as somebody’s own thought, said in their own way. AI tools are superb
+              at producing words and rather poor at producing that. They smooth away the quirks, the opinions and the
+              odd turns of phrase that make a writer recognisable, and what’s left is perfectly polished and strangely
+              anonymous.
+            </p>
+            <p>
+              OG Humanizer exists to put some of that originality back. It won’t invent your experiences or your
+              opinions, which only you can supply, but it will strip out the machine-made gloss so that what you add
+              actually stands out.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section
+        number="03 · What changes"
         title="Six habits our humanizer rewrites out of your draft"
         lede={
           <p>
@@ -141,7 +176,7 @@ export function HumanizeContent() {
       </Section>
 
       <Section
-        number="03 · Examples"
+        number="04 · Examples"
         title="Before and after: AI text, humanized"
         lede={<p>Three short passages of typical machine-drafted prose, and what the AI humanizer tool made of them.</p>}
       >
@@ -166,7 +201,7 @@ export function HumanizeContent() {
         </p>
       </Section>
 
-      <Section number="04 · Good uses" title="When a free AI humanizer earns its keep">
+      <Section number="05 · Good uses" title="When a free AI humanizer earns its keep">
         <div className="grid gap-8 text-lg leading-relaxed text-muted md:grid-cols-2">
           <div className="space-y-4">
             <p>
@@ -202,7 +237,7 @@ export function HumanizeContent() {
         </div>
       </Section>
 
-      <Section number="05 · Straight talk" title="A candid word about AI detectors">
+      <Section number="06 · Straight talk" title="A candid word about AI detectors">
         <div className="grid gap-8 md:grid-cols-[1.1fr_1fr]">
           <div className="space-y-4 text-lg leading-relaxed text-muted">
             <p>
@@ -227,7 +262,7 @@ export function HumanizeContent() {
         </div>
       </Section>
 
-      <Section number="06 · Do it yourself" title="How to humanize AI content by hand">
+      <Section number="07 · Do it yourself" title="How to humanize AI content by hand">
         <div className="grid gap-8 text-lg leading-relaxed text-muted md:grid-cols-2">
           <p>
             A tool gets you most of the way, but the final polish is always yours. Start by cutting the first sentence of
@@ -245,7 +280,7 @@ export function HumanizeContent() {
               Tagalog AI humanizer
             </Link>
             , and if you simply want a fresh wording rather than a change of voice, the{" "}
-            <Link href="/" className="text-accent-text underline underline-offset-2">
+            <Link href="/paraphrasing-tool" className="text-accent-text underline underline-offset-2">
               free paraphrasing tool
             </Link>{" "}
             has seven more styles to choose from.
@@ -253,11 +288,44 @@ export function HumanizeContent() {
         </div>
       </Section>
 
-      <Section number="07 · Questions" title="AI humanizer FAQ">
+      <Section
+        id="languages"
+        number="08 · Languages"
+        title="Humanize AI text in twelve languages"
+        lede={
+          <p>
+            Paste text in English, Filipino, Urdu, Arabic, Hindi, Spanish, French, German, Portuguese, Indonesian,
+            Turkish or Bengali and the humanized version comes back in the same language and script. Want it in a
+            different language? Pick one from the output menu and OG Humanizer will translate and humanize in one go.
+          </p>
+        }
+      >
+        <LanguageChips />
+      </Section>
+
+      <Section number="09 · Questions" title="AI humanizer FAQ">
         <Faq items={HUMANIZE_FAQS} />
       </Section>
 
-      <MoreTools current="humanize-ai" />
+      <section className="mx-auto mt-24 max-w-6xl px-4">
+        <div className="relative overflow-hidden rounded-[32px] bg-[#1d1b18] px-6 py-14 text-center text-[#f7f4ee] ring-1 ring-border sm:px-12 sm:py-20">
+          <div aria-hidden="true" className="hero-dots absolute inset-0 opacity-20" />
+          <h2 className="relative font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+            Sound like the <span className="text-[#fb923c] italic">original</span> you.
+          </h2>
+          <p className="relative mx-auto mt-4 max-w-xl text-lg opacity-75">
+            Paste your draft, press Humanize, and read it back. Free, every time, with nothing to sign up for.
+          </p>
+          <Link
+            href="#tool"
+            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent transition hover:bg-accent-hover"
+          >
+            Humanize my text ↑
+          </Link>
+        </div>
+      </section>
+
+      <MoreTools />
     </>
   );
 }

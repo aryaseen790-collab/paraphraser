@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { usesGemini } from "@/config/ai";
-import { getLanguage } from "@/config/languages";
-import { LANGUAGE_PAGES } from "@/config/landing";
 import { Faq } from "./Faq";
+import { LanguageChips } from "./LanguageChips";
 import { Section } from "./Section";
 
 const STYLES = [
@@ -15,7 +14,7 @@ const STYLES = [
   },
   {
     name: "Humanize",
-    href: "/humanize-ai",
+    href: "/",
     text: "For drafts that sound machine-made. It loosens the rhythm, cuts the stock phrases and swaps buzzwords for plain ones, so the text reads like a person wrote it.",
     before: "In today’s fast-paced world, it is important to note that effective communication plays a crucial role in fostering success.",
     after: "Clear communication goes a long way towards success.",
@@ -110,7 +109,7 @@ const AUDIENCES = [
   },
 ];
 
-export function HomeContent() {
+export function ParaphraserContent() {
   const gemini = usesGemini();
 
   return (
@@ -227,7 +226,7 @@ export function HomeContent() {
             </p>
             <div className="mt-5 flex flex-wrap gap-3">
               <Link
-                href="/humanize-ai"
+                href="/"
                 className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-semibold text-on-accent transition hover:bg-accent-hover"
               >
                 Open the AI humanizer →
@@ -277,23 +276,7 @@ export function HomeContent() {
             choose English, and you get a polished English version back. It’s no substitute for a professional
             translator on legal or medical documents, but for emails, messages and first drafts it saves a lot of time.
           </p>
-          <ul className="flex flex-wrap gap-2.5">
-            {LANGUAGE_PAGES.map((p) => (
-              <li key={p.slug}>
-                <Link
-                  href={`/${p.slug}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm transition hover:border-foreground"
-                >
-                  <span className="font-medium">{p.h1.replace(" Paraphrasing Tool", "")}</span>
-                  {p.language && p.language !== "en" && (
-                    <span lang={p.language} className="text-muted">
-                      {getLanguage(p.language)?.label.match(/\(([^)]+)\)/)?.[1]}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <LanguageChips />
         </div>
       </Section>
 

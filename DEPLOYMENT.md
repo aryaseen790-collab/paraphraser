@@ -1,6 +1,6 @@
 # Deployment guide (Phase 5)
 
-This guide takes the site from your laptop to `https://yourdomain.com` on Vercel. Budget about an hour the first time.
+This guide takes the site from your laptop to `https://oghumanizer.com` on Vercel. Budget about an hour the first time.
 
 ## 1. Create the accounts and keys
 
@@ -46,19 +46,19 @@ npm run build     # production build + automatic secret-leak check
 
 ## 4. Connect your custom domain
 
-1. Vercel → Project → **Settings → Domains → Add** `yourdomain.com` (and `www.yourdomain.com`, set to redirect to the apex or the other way round).
+1. Vercel → Project → **Settings → Domains → Add** `oghumanizer.com` (and `www.oghumanizer.com`, set to redirect to the apex or the other way round).
 2. At your registrar, create the DNS records Vercel shows, usually:
-   - apex `yourdomain.com`: **A** record → `76.76.21.21`
+   - apex `oghumanizer.com`: **A** record → `76.76.21.21`
    - `www`: **CNAME** → `cname.vercel-dns.com`
 3. Wait for the green "Valid Configuration" tick. HTTPS certificates are issued automatically.
-4. Set `NEXT_PUBLIC_SITE_URL=https://yourdomain.com` and redeploy so canonical URLs, Open Graph tags and the sitemap use the real domain.
-5. Add `yourdomain.com` to the Turnstile widget's hostname list.
+4. Set `NEXT_PUBLIC_SITE_URL=https://oghumanizer.com` and redeploy so canonical URLs, Open Graph tags and the sitemap use the real domain.
+5. Add `oghumanizer.com` to the Turnstile widget's hostname list.
 
 > If you put Cloudflare's proxy (orange cloud) in front of Vercel, the server reads the visitor IP from `cf-connecting-ip`. If you **don't** use Cloudflare's proxy, nobody can set that header except the visitor, so remove it from `src/lib/ip.ts` to stop clients spoofing their rate-limit identity.
 
 ## 5. Search Console and analytics
 
-1. **Google Search Console** → Add property → Domain → verify with the DNS TXT record → **Sitemaps** → submit `https://yourdomain.com/sitemap.xml`.
+1. **Google Search Console** → Add property → Domain → verify with the DNS TXT record → **Sitemaps** → submit `https://oghumanizer.com/sitemap.xml`.
 2. **Analytics:** Vercel Web Analytics (one click in the dashboard), Plausible, or Google Analytics. If you add a cookie-based tool or ads and have EU/UK visitors, add a consent banner.
 
 ## 6. Turning on ads (later)
@@ -86,7 +86,7 @@ npm run build     # production build + automatic secret-leak check
 - [ ] Rate limit works: 31 quick requests from one browser → the 31st gets "You've sent a lot of requests…".
 - [ ] Cache works: paraphrase the same text twice with the same style; the second response has header `X-Cache: HIT` and is instant.
 - [ ] Input cap works: pasting 1,001+ words disables the button. The server also rejects it if you call the API directly.
-- [ ] `curl -X POST https://yourdomain.com/api/paraphrase -H 'content-type: application/json' -d '{"text":"hi","mode":"standard","language":"auto"}'` returns *403 "We couldn't verify your browser"* (no Turnstile token = no Claude call).
+- [ ] `curl -X POST https://oghumanizer.com/api/paraphrase -H 'content-type: application/json' -d '{"text":"hi","mode":"standard","language":"auto"}'` returns *403 "We couldn't verify your browser"* (no Turnstile token = no Claude call).
 
 **Product**
 - [ ] A 300-word paste returns its first words in under 2 seconds and finishes in under 5.
@@ -95,7 +95,7 @@ npm run build     # production build + automatic secret-leak check
 - [ ] About, Privacy, Terms and Contact pages have your real details (replace `hello@example.com`); legal text reviewed for your country.
 
 **SEO**
-- [ ] `https://yourdomain.com/sitemap.xml` and `/robots.txt` load and show your real domain.
+- [ ] `https://oghumanizer.com/sitemap.xml` and `/robots.txt` load and show your real domain.
 - [ ] Sitemap submitted in Google Search Console.
 - [ ] Share a link in WhatsApp/Slack: the preview image and title appear.
 

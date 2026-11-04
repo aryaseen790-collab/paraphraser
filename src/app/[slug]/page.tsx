@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { HUMANIZE_FAQS, HumanizeContent } from "@/components/HumanizeContent";
 import { HumanizeTagalogContent, TAGALOG_FAQS } from "@/components/HumanizeTagalogContent";
 import { ToolPage } from "@/components/ToolPage";
 import { LANDING_PAGES, getLandingPage } from "@/config/landing";
@@ -28,11 +27,7 @@ export default async function LandingPage({ params }: PageProps<"/[slug]">) {
   if (!page) notFound();
 
   const custom =
-    page.content === "humanize"
-      ? { children: <HumanizeContent />, faqs: HUMANIZE_FAQS }
-      : page.content === "humanize-tagalog"
-        ? { children: <HumanizeTagalogContent />, faqs: TAGALOG_FAQS }
-        : {};
+    page.content === "humanize-tagalog" ? { children: <HumanizeTagalogContent />, faqs: TAGALOG_FAQS } : {};
 
   return (
     <ToolPage

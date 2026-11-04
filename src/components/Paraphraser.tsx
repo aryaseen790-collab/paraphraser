@@ -171,6 +171,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
   }
 
   const outputWords = countWords(output);
+  const actionLabel = mode === "humanize" ? "Humanize" : "Paraphrase";
   const panelText = "min-h-56 flex-1 px-4 py-3 text-[1.0625rem] leading-relaxed sm:px-5 md:min-h-80";
 
   return (
@@ -251,7 +252,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
                     void paraphrase();
                   }
                 }}
-                placeholder="Paste or type your text here, then press Paraphrase."
+                placeholder={`Paste or type your text here, then press ${actionLabel}.`}
                 className={`${panelText} resize-y bg-transparent outline-none placeholder:text-muted/70`}
               />
             </>
@@ -333,7 +334,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
             ) : (
               <span className="hidden sm:inline">
                 Tip: press <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Ctrl</kbd> +{" "}
-                <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd> to paraphrase.
+                <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd> to {actionLabel.toLowerCase()}.
               </span>
             ))}
         </p>
@@ -343,7 +344,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
           disabled={!canSubmit}
           className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent shadow-sm transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
         >
-          {busy ? "Paraphrasing…" : "Paraphrase"}
+          {busy ? (mode === "humanize" ? "Humanizing…" : "Paraphrasing…") : actionLabel}
           {!busy && (
             <svg viewBox="0 0 16 16" className="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
               <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />

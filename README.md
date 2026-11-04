@@ -1,6 +1,6 @@
-# Paraphraser: a free AI paraphrasing website
+# OG Humanizer ([oghumanizer.com](https://oghumanizer.com))
 
-A free paraphrasing site powered by **Claude Haiku 5.5** (`claude-haiku-5-5`) or **Google Gemini** (free tier), switchable with one setting. It feels unlimited to normal users (no sign-up, no credit counter) while invisible guardrails keep the API bill under a hard cap.
+A free AI humanizer and paraphrasing site powered by **Claude Haiku 5.5** (`claude-haiku-5-5`) or **Google Gemini** (free tier), switchable with one setting. It feels unlimited to normal users (no sign-up, no credit counter) while invisible guardrails keep the API bill under a hard cap.
 
 **Stack:** Next.js 16 (App Router, TypeScript) · Tailwind CSS v4 · Anthropic TypeScript SDK · Google Gen AI SDK · Upstash Redis · Cloudflare Turnstile · Vercel
 
@@ -26,7 +26,8 @@ Set `AI_PROVIDER` (and the matching key) in your environment, then redeploy:
 - Streaming output (words appear as they're generated)
 - Side-by-side view with changed words highlighted, Copy and Clear
 - Light/dark theme, mobile-first layout, right-to-left text support
-- 18 SEO landing pages (`/formal-paraphraser`, `/urdu-paraphrasing-tool`, …), guides, sitemap, robots.txt, Open Graph image
+- Home page (`/`) is the AI humanizer (primary keyword "humanize ai"); the paraphraser lives at `/paraphrasing-tool`; `/humanize-ai` permanently redirects to `/`
+- SEO landing pages (`/formal-paraphraser`, `/urdu-paraphrasing-tool`, `/humanize-ai-tagalog`, …), guides, sitemap, robots.txt, Open Graph image
 - About, Privacy Policy, Terms of Use, Contact pages
 - Ad slots beside or below the tool (off by default)
 

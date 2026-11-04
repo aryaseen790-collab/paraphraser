@@ -17,22 +17,10 @@ export interface LandingPage {
   /** Small label above the heading. */
   eyebrow?: string;
   /** Long-form content block to show under the tool instead of the default. */
-  content?: "humanize" | "humanize-tagalog";
+  content?: "humanize-tagalog";
 }
 
 export const HUMANIZER_PAGES: LandingPage[] = [
-  {
-    slug: "humanize-ai",
-    mode: "humanize",
-    eyebrow: "Free AI humanizer",
-    title: "Humanize AI Text Free | AI Humanizer Tool",
-    description:
-      "Humanize AI text in seconds. Our free AI humanizer turns stiff, robotic drafts into natural writing that sounds like you. No sign-up, no word credits.",
-    h1: "Humanize AI text so it sounds like you",
-    intro:
-      "Paste a draft that reads like it came off a production line. Our free AI humanizer reworks the rhythm, trims the filler and swaps generic phrasing for plain, specific language, while your facts stay exactly where you left them.",
-    content: "humanize",
-  },
   {
     slug: "humanize-ai-tagalog",
     mode: "humanize",

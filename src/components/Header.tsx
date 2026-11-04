@@ -3,8 +3,8 @@ import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const nav = [
-  { href: "/humanize-ai", label: "AI Humanizer" },
-  { href: "/#styles", label: "Styles" },
+  { href: "/", label: "AI Humanizer" },
+  { href: "/paraphrasing-tool", label: "Paraphraser" },
   { href: "/#languages", label: "Languages" },
   { href: "/guides", label: "Guides" },
   { href: "/about", label: "About" },
@@ -31,7 +31,7 @@ export function Header() {
             href="/#tool"
             className="ml-1 hidden rounded-full bg-foreground px-4 py-1.5 font-medium text-background transition hover:opacity-85 sm:inline-block"
           >
-            Try it free
+            Humanize free
           </Link>
           <span className="ml-1">
             <ThemeToggle />

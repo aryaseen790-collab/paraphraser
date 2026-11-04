@@ -14,7 +14,7 @@ export const GUIDES: Guide[] = [
     title: "How to Humanize AI Content: An Editor’s Guide",
     description:
       "How to humanize AI content so it reads like a person wrote it: the tell-tale patterns, a seven-step editing method, worked examples and when to use an AI humanizer.",
-    toolSlug: "humanize-ai",
+    toolSlug: "",
     toolLabel: "AI Humanizer",
     sections: [
       {
