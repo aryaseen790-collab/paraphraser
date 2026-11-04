@@ -54,7 +54,9 @@ npm run build     # production build + automatic secret-leak check
 4. Set `NEXT_PUBLIC_SITE_URL=https://oghumanizer.com` and redeploy so canonical URLs, Open Graph tags and the sitemap use the real domain.
 5. Add `oghumanizer.com` to the Turnstile widget's hostname list.
 
-> If you put Cloudflare's proxy (orange cloud) in front of Vercel, the server reads the visitor IP from `cf-connecting-ip`. If you **don't** use Cloudflare's proxy, nobody can set that header except the visitor, so remove it from `src/lib/ip.ts` to stop clients spoofing their rate-limit identity.
+> **Cloudflare DNS:** keep the records for the apex and `www` on **DNS only** (grey cloud), as Vercel recommends. The rate limit then uses Vercel's own client-IP headers. If you deliberately proxy through Cloudflare (orange cloud) instead, set `TRUST_CLOUDFLARE_IP=true` so the rate limit sees real visitor IPs rather than Cloudflare's.
+>
+> **Primary domain:** make `oghumanizer.com` serve Production and set `www.oghumanizer.com` to redirect to it, so the canonical URLs the site declares never point at a redirect.
 
 ## 5. Search Console and analytics
 
