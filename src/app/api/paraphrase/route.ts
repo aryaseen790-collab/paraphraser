@@ -27,39 +27,43 @@ const STREAM_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 };
 
-function jsonError(message: string, status: number, headers?: Record<string, string>) {
-  return Response.json({ error: message }, { status, headers: { "Cache-Control": "no-store", ...headers } });
+type MessageKey = keyof typeof MESSAGES;
+
+/** JSON error with an English message plus a code the browser can translate. */
+function jsonError(key: MessageKey | { message: string; code: string }, status: number, headers?: Record<string, string>) {
+  const body = typeof key === "string" ? { error: MESSAGES[key], code: key } : { error: key.message, code: key.code };
+  return Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 }
 
 /** Every check below runs before the AI model is called, so a rejected request costs nothing. */
 export async function POST(request: Request) {
   // 1. Size and shape of the input.
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
-  if (declaredLength > MAX_BODY_BYTES) return jsonError(MESSAGES.tooLarge, 413);
+  if (declaredLength > MAX_BODY_BYTES) return jsonError("tooLarge", 413);
 
   let body: unknown;
   try {
     const raw = await request.text();
-    if (raw.length > MAX_BODY_BYTES) return jsonError(MESSAGES.tooLarge, 413);
+    if (raw.length > MAX_BODY_BYTES) return jsonError("tooLarge", 413);
     body = JSON.parse(raw);
   } catch {
-    return jsonError(MESSAGES.invalid, 400);
+    return jsonError("invalid", 400);
   }
 
   const parsed = validateRequestBody(body);
-  if (!parsed.ok) return jsonError(parsed.error, 400);
+  if (!parsed.ok) return jsonError({ message: parsed.error, code: parsed.code }, 400);
   const { text, mode, language, turnstileToken } = parsed.value;
 
   const store = getStore();
   if (!store) {
     console.error("[paraphrase] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not set; refusing to call the AI model.");
-    return jsonError(MESSAGES.generic, 503);
+    return jsonError("generic", 503);
   }
 
   let providers = getProviderChain();
   if (providers.length === 0) {
     console.error("[paraphrase] No AI provider configured: set AI_PROVIDER and its API key (ANTHROPIC_API_KEY / GEMINI_API_KEY).");
-    return jsonError(MESSAGES.generic, 503);
+    return jsonError("generic", 503);
   }
 
   const ip = getClientIp(request);
@@ -71,7 +75,7 @@ export async function POST(request: Request) {
     if (!limit.success) {
       const retryAfter = Math.max(1, Math.ceil((limit.reset - Date.now()) / 1000));
       void recordStats(store, { rateLimited: 1 }).catch(() => {});
-      return jsonError(MESSAGES.rateLimited, 429, { "Retry-After": String(retryAfter) });
+      return jsonError("rateLimited", 429, { "Retry-After": String(retryAfter) });
     }
 
     // 3. Invisible bot check.
@@ -79,10 +83,10 @@ export async function POST(request: Request) {
     if (!turnstile.ok) {
       if (turnstile.reason === "not-configured") {
         console.error("[paraphrase] TURNSTILE_SECRET_KEY is not set; refusing to call the AI model.");
-        return jsonError(MESSAGES.generic, 503);
+        return jsonError("generic", 503);
       }
       void recordStats(store, { botBlocked: 1 }).catch(() => {});
-      return jsonError(MESSAGES.botCheck, turnstile.reason === "unavailable" ? 503 : 403);
+      return jsonError("botCheck", turnstile.reason === "unavailable" ? 503 : 403);
     }
 
     // 4. Cached result: free and instant.
@@ -98,12 +102,12 @@ export async function POST(request: Request) {
       providers = providers.filter((p) => isFreeProvider(p.id));
       if (providers.length === 0) {
         void recordStats(store, { budgetBlocked: 1 }).catch(() => {});
-        return jsonError(MESSAGES.highDemand, 503, { "Retry-After": "600" });
+        return jsonError("highDemand", 503, { "Retry-After": "600" });
       }
     }
   } catch (err) {
     console.error("[paraphrase] protection check failed:", err);
-    return jsonError(MESSAGES.generic, 503);
+    return jsonError("generic", 503);
   }
 
   // 6. Call the AI model and stream the answer.
@@ -143,8 +147,8 @@ export async function POST(request: Request) {
               } else {
                 used.inputTokens = event.inputTokens;
                 used.outputTokens = event.outputTokens;
-                if (event.stopReason === "refusal") send(encodeControl({ error: MESSAGES.refusal }));
-                else if (event.stopReason === "max_tokens") send(encodeControl({ notice: MESSAGES.truncated }));
+                if (event.stopReason === "refusal") send(encodeControl({ error: MESSAGES.refusal, code: "refusal" }));
+                else if (event.stopReason === "max_tokens") send(encodeControl({ notice: MESSAGES.truncated, code: "truncated" }));
                 else if (output.trim()) completed = true;
               }
             }
@@ -156,7 +160,8 @@ export async function POST(request: Request) {
             if (output || isLast) {
               // Text already reached the user (can't switch models mid-answer), or nothing left to try.
               console.error(`[paraphrase] ${provider.label} request failed:`, err);
-              send(encodeControl({ error: err instanceof ProviderBusyError && !output ? MESSAGES.highDemand : MESSAGES.generic }));
+              const busyErr = err instanceof ProviderBusyError && !output;
+              send(encodeControl({ error: busyErr ? MESSAGES.highDemand : MESSAGES.generic, code: busyErr ? "highDemand" : "generic" }));
               break;
             }
             console.warn(`[paraphrase] ${provider.label} failed before answering; trying ${providers[i + 1].label}.`, err);

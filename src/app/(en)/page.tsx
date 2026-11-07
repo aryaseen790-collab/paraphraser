@@ -1,5 +1,19 @@
+import { pageOpenGraph } from "@/components/SiteShell";
+import type { Metadata } from "next";
 import { HUMANIZE_FAQS, HumanizeContent } from "@/components/HumanizeContent";
 import { ToolPage } from "@/components/ToolPage";
+import { siteConfig } from "@/config/site";
+import { localeAlternates } from "@/i18n/locales";
+
+const title = `Humanize AI Text Free: AI Humanizer | ${siteConfig.name}`;
+
+export const metadata: Metadata = {
+  title: { absolute: title },
+  description: siteConfig.description,
+  alternates: localeAlternates("home", "en"),
+  openGraph: pageOpenGraph("en", { title, description: siteConfig.description, url: "/" }),
+  twitter: { title, description: siteConfig.description },
+};
 
 export default function Home() {
   return (

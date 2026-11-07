@@ -1,6 +1,8 @@
+import { pageOpenGraph } from "@/components/SiteShell";
 import type { Metadata } from "next";
 import { ParaphraserContent } from "@/components/ParaphraserContent";
 import { ToolPage } from "@/components/ToolPage";
+import { localeAlternates } from "@/i18n/locales";
 
 const title = "Free Paraphrasing Tool: Rewrite in 8 Styles";
 const description =
@@ -9,8 +11,8 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/paraphrasing-tool" },
-  openGraph: { title, description, url: "/paraphrasing-tool" },
+  alternates: localeAlternates("paraphraser", "en"),
+  openGraph: pageOpenGraph("en", { title, description, url: "/paraphrasing-tool" }),
   twitter: { title, description },
 };
 

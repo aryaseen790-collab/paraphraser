@@ -1,3 +1,4 @@
+import { pageOpenGraph } from "@/components/SiteShell";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { HumanizeTagalogContent, TAGALOG_FAQS } from "@/components/HumanizeTagalogContent";
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: PageProps<"/[slug]">): Promis
     title: page.title,
     description: page.description,
     alternates: { canonical: `/${page.slug}` },
-    openGraph: { title: page.title, description: page.description, url: `/${page.slug}` },
+    openGraph: pageOpenGraph("en", { title: page.title, description: page.description, url: `/${page.slug}` }),
     twitter: { title: page.title, description: page.description },
   };
 }

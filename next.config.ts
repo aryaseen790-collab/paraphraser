@@ -15,6 +15,8 @@ const nextConfig: NextConfig = {
     // Put the small Tailwind stylesheet straight into the HTML so the first paint
     // doesn't wait for a second request.
     inlineCss: true,
+    // One 404 page for URLs that match no route (the site has a root layout per language).
+    globalNotFound: true,
   },
   turbopack: {
     rules: {
@@ -26,7 +28,15 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     // The humanizer now lives on the home page.
-    return [{ source: "/humanize-ai", destination: "/", permanent: true }];
+    return [
+      { source: "/humanize-ai", destination: "/", permanent: true },
+      // These languages now have full translated sites.
+      { source: "/spanish-paraphrasing-tool", destination: "/es/parafraseador", permanent: true },
+      { source: "/portuguese-paraphrasing-tool", destination: "/pt/reescrever-texto", permanent: true },
+      { source: "/french-paraphrasing-tool", destination: "/fr/reformuler-un-texte", permanent: true },
+      { source: "/indonesian-paraphrasing-tool", destination: "/id/parafrase-online", permanent: true },
+      { source: "/german-paraphrasing-tool", destination: "/de/text-umschreiben", permanent: true },
+    ];
   },
   async headers() {
     const headers = [...securityHeaders];

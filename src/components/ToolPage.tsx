@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type { ModeId } from "@/config/modes";
 import { siteConfig } from "@/config/site";
 import { faqJsonLd, type FaqItem } from "@/content/faq";
+import { EN_CHROME } from "@/i18n/en";
+import type { ChromeStrings, ToolStrings } from "@/i18n/types";
 import { AdSlot } from "./AdSlot";
 import { InfoSections } from "./InfoSections";
 import { MoreTools } from "./MoreTools";
@@ -21,18 +23,39 @@ interface ToolPageProps {
   children?: ReactNode;
   /** FAQ items for structured data, when the page shows its own FAQ. */
   faqs?: FaqItem[];
+  /** Translated tool and page text (English by default). */
+  t?: ToolStrings;
+  chrome?: ChromeStrings;
+  /** Page language for structured data. */
+  inLanguage?: string;
+  /** Full path of the page, for structured data (defaults to "/" + slug). */
+  path?: string;
 }
 
-const FACTS = ["No account needed", "Up to 1,000 words at a time", "Eight writing styles", "Twelve languages"];
-
 /** Shared layout for the home page and every SEO landing page. */
-export function ToolPage({ h1, name, intro, eyebrow = "Free paraphrasing tool", native, mode, language, slug, children, faqs }: ToolPageProps) {
+export function ToolPage({
+  h1,
+  name,
+  intro,
+  eyebrow = "Free paraphrasing tool",
+  native,
+  mode,
+  language,
+  slug,
+  children,
+  faqs,
+  t,
+  chrome = EN_CHROME,
+  inLanguage = "en",
+  path,
+}: ToolPageProps) {
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       name: `${name} | ${siteConfig.name}`,
-      url: `${siteConfig.url}/${slug ?? ""}`,
+      url: `${siteConfig.url}${path ?? `/${slug ?? ""}`}`,
+      inLanguage,
       applicationCategory: "UtilitiesApplication",
       operatingSystem: "Any",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -65,13 +88,13 @@ export function ToolPage({ h1, name, intro, eyebrow = "Free paraphrasing tool", 
         <div id="tool" className="mx-auto max-w-6xl scroll-mt-20 px-4">
           <div className={siteConfig.adsEnabled ? "grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]" : ""}>
             <div className="min-w-0">
-              <Paraphraser defaultMode={mode} defaultLanguage={language} />
-              <AdSlot slot="below-tool" className="mt-6 lg:hidden" />
+              <Paraphraser defaultMode={mode} defaultLanguage={language} t={t} />
+              <AdSlot slot="below-tool" className="mt-6 lg:hidden" label={chrome.adLabel} />
             </div>
-            <AdSlot slot="sidebar" className="hidden lg:block" />
+            <AdSlot slot="sidebar" className="hidden lg:block" label={chrome.adLabel} />
           </div>
           <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted">
-            {FACTS.map((f) => (
+            {chrome.facts.map((f) => (
               <li key={f} className="flex items-center gap-2">
                 <svg viewBox="0 0 16 16" className="h-4 w-4 text-accent-text" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                   <path d="M3 8.5l3 3 7-7" strokeLinecap="round" strokeLinejoin="round" />

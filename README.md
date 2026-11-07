@@ -26,6 +26,7 @@ Set `AI_PROVIDER` (and the matching key) in your environment, then redeploy:
 - Streaming output (words appear as they're generated)
 - Side-by-side view with changed words highlighted, Copy and Clear
 - Light/dark theme, mobile-first layout, right-to-left text support
+- **Multilingual:** full translated sites for Spanish (`/es`), Portuguese (`/pt`), French (`/fr`), Indonesian (`/id`) and German (`/de`), each with its own `<html lang>`, a humanizer home page and a paraphraser page on keyword-matched URLs (e.g. `/fr/reformuler-un-texte`), hreflang links between all versions, a translated tool interface and translated error messages. Content lives in `src/i18n/dictionaries/`; URLs in `src/i18n/locales.ts`
 - Home page (`/`) is the AI humanizer (primary keyword "humanize ai"); the paraphraser lives at `/paraphrasing-tool`; `/humanize-ai` permanently redirects to `/`
 - SEO landing pages (`/formal-paraphraser`, `/urdu-paraphrasing-tool`, `/humanize-ai-tagalog`, …), guides, sitemap, robots.txt, Open Graph image
 - About, Privacy Policy, Terms of Use, Contact pages
@@ -101,6 +102,8 @@ Without Upstash/Turnstile keys, local dev uses an in-memory store and skips the 
 ```
 src/
   app/
+    (en)/                     English site (root layout with lang="en")
+    (es)/ (pt)/ (fr)/ (id)/ (de)/   one root layout per language, each with its home + paraphraser page
     api/paraphrase/route.ts   the only place that calls the AI model (all checks live here)
     [slug]/page.tsx           SEO landing pages
     guides/                   how-to articles
@@ -108,6 +111,7 @@ src/
     sitemap.ts, robots.ts, opengraph-image.tsx, icon.svg
   components/                 Paraphraser (the tool), ToolPage, AdSlot, theme, header/footer
   config/                     editable settings (see above)
+  i18n/                       languages, URLs, hreflang helper and translated dictionaries
   lib/ai/                     Claude and Gemini providers + fallback chain
   lib/                        prompt building, validation, store (Redis), budget, Turnstile, diff
 scripts/check-secrets.mjs     fails the build if a secret leaks into browser files

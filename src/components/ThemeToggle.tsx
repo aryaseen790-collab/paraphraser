@@ -1,6 +1,6 @@
 "use client";
 
-export function ThemeToggle() {
+export function ThemeToggle({ label = "Toggle dark mode" }: { label?: string }) {
   function toggle() {
     const isDark = document.documentElement.classList.toggle("dark");
     try {
@@ -14,8 +14,8 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label="Toggle dark mode"
-      title="Toggle dark mode"
+      aria-label={label}
+      title={label}
       className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-muted transition hover:text-foreground"
     >
       {/* Sun (shown in dark mode) */}

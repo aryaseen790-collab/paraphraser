@@ -1,3 +1,4 @@
+import { pageOpenGraph } from "@/components/SiteShell";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<"/guides/[slug]">):
     title: guide.title,
     description: guide.description,
     alternates: { canonical: `/guides/${guide.slug}` },
-    openGraph: { type: "article", title: guide.title, description: guide.description, url: `/guides/${guide.slug}` },
+    openGraph: pageOpenGraph("en", { type: "article", title: guide.title, description: guide.description, url: `/guides/${guide.slug}` }),
   };
 }
 

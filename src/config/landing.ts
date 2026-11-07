@@ -144,56 +144,6 @@ export const LANGUAGE_PAGES: LandingPage[] = [
     native: { lang: "hi", text: "अपने हिन्दी लेख को नए शब्दों में लिखें।" },
   },
   {
-    slug: "spanish-paraphrasing-tool",
-    language: "es",
-    title: "Spanish Paraphrasing Tool (Parafraseador en Español)",
-    description: "Parafraseador gratis en español. Free Spanish paraphrasing tool with formal, simple and creative styles.",
-    h1: "Spanish Paraphrasing Tool",
-    intro:
-      "Rewrite Spanish essays, emails and posts in a new style, from formal to creative, with no account needed.",
-    native: { lang: "es", text: "Parafrasea textos en español al instante." },
-  },
-  {
-    slug: "french-paraphrasing-tool",
-    language: "fr",
-    title: "French Paraphrasing Tool (Reformulateur de Texte)",
-    description: "Reformulez vos textes en français gratuitement. Free French paraphrasing tool in eight styles.",
-    h1: "French Paraphrasing Tool",
-    intro:
-      "Rewrite French text in a more formal, fluent or concise way: useful for letters, coursework and professional emails.",
-    native: { lang: "fr", text: "Reformulez vos phrases en français." },
-  },
-  {
-    slug: "german-paraphrasing-tool",
-    language: "de",
-    title: "German Paraphrasing Tool (Umformulieren)",
-    description: "Texte kostenlos umformulieren. Free German paraphrasing tool with formal and simple styles.",
-    h1: "German Paraphrasing Tool",
-    intro:
-      "Rewrite German text with clearer wording or a more formal register, for applications, emails and study work.",
-    native: { lang: "de", text: "Texte auf Deutsch umformulieren." },
-  },
-  {
-    slug: "portuguese-paraphrasing-tool",
-    language: "pt",
-    title: "Portuguese Paraphrasing Tool (Parafrasear Texto)",
-    description: "Parafraseador grátis em português. Free Portuguese paraphrasing tool, no sign-up.",
-    h1: "Portuguese Paraphrasing Tool",
-    intro:
-      "Rewrite Portuguese text in eight styles, from simple to formal, keeping your meaning intact.",
-    native: { lang: "pt", text: "Parafraseie textos em português com facilidade." },
-  },
-  {
-    slug: "indonesian-paraphrasing-tool",
-    language: "id",
-    title: "Indonesian Paraphrasing Tool (Parafrase Bahasa Indonesia)",
-    description: "Alat parafrase Bahasa Indonesia gratis. Free Indonesian paraphrasing tool.",
-    h1: "Indonesian Paraphrasing Tool",
-    intro:
-      "Rewrite Indonesian text for assignments, articles and messages in the style you need.",
-    native: { lang: "id", text: "Parafrase kalimat Bahasa Indonesia secara gratis." },
-  },
-  {
     slug: "turkish-paraphrasing-tool",
     language: "tr",
     title: "Turkish Paraphrasing Tool (Metin Yeniden Yazma)",

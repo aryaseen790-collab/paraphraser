@@ -8,6 +8,8 @@ export const CONTROL_MARKER = "\u0000";
 export interface StreamControl {
   error?: string;
   notice?: string;
+  /** Machine-readable reason, so the browser can show a translated message. */
+  code?: string;
 }
 
 export function encodeControl(control: StreamControl): string {
