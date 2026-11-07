@@ -63,9 +63,15 @@ export default function PrivacyPage() {
 
       <h2>Cookies, analytics and ads</h2>
       <p>
-        We store your light or dark theme choice in your browser. If analytics or advertising (for example Google
-        AdSense) are enabled, those providers may use cookies or similar technologies to measure traffic and show ads.
-        Where the law requires it, we will ask for your consent first.
+        We store your light or dark theme choice in your browser. We use Google Tag Manager and Google Analytics to
+        understand how many people visit, which pages they read and how they found us. These tools set cookies and
+        collect information such as pages viewed, approximate location, device and browser type. They do not receive
+        the text you paste into the tool. See{" "}
+        <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" target="_blank">
+          how Google uses data from sites that use its services
+        </a>
+        . If advertising (for example Google AdSense) is enabled, ad providers may also use cookies to show and measure
+        ads. Where the law requires it, we will ask for your consent first.
       </p>
 
       <h2>Your choices and contact</h2>

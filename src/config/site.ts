@@ -16,5 +16,9 @@ export const siteConfig = {
    * sitemap is not advertised. Changing it requires a redeploy.
    */
   indexable: process.env.ALLOW_INDEXING === "true",
+  /** Google Tag Manager container (loads GA4 and any other tags set up in GTM). */
+  gtmId: process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-5MB8P6S8",
+  /** Google Search Console HTML-tag verification code. */
+  googleSiteVerification: process.env.GOOGLE_SITE_VERIFICATION ?? "4EbDJiiR0iKIua1RwEX21Fg9A3OsVYTsb3kORttuufQ",
   adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "",
 } as const;

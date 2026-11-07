@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
 import { Fraunces, Geist } from "next/font/google";
 import "./globals.css";
@@ -25,6 +26,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   applicationName: siteConfig.name,
+  verification: siteConfig.googleSiteVerification ? { google: siteConfig.googleSiteVerification } : undefined,
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -59,6 +61,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${fraunces.variable} h-full antialiased`}
     >
+      {/* Google Tag Manager: loads after the page is interactive so it doesn't slow the first paint. */}
+      {siteConfig.gtmId && <GoogleTagManager gtmId={siteConfig.gtmId} />}
       <head>
         <ThemeScript />
       </head>
