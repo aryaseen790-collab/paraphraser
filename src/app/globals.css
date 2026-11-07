@@ -3,43 +3,57 @@
 /* Dark mode follows a `.dark` class on <html>, set before paint by ThemeScript. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Warm "paper and ink" palette with one vermillion accent. */
+/* "Ink & highlighter": white paper, deep ink text, electric cobalt, highlighter yellow. */
 :root {
-  --background: #f7f4ee;
-  --surface: #fffdf9;
-  --surface-muted: #f1ece3;
-  --foreground: #1d1b18;
-  --muted: #6b655c;
-  --border: #e5ded2;
-  --accent: #c2410c;
-  --accent-hover: #9a3412;
-  --accent-text: #c2410c;
-  --accent-soft: #fde5d6;
+  --background: #ffffff;
+  --surface: #ffffff;
+  --surface-muted: #f2f4ff;
+  --tint: #f5f7ff;
+  --foreground: #0e1330;
+  --muted: #565d80;
+  --border: #e2e6f5;
+  --accent: #3346ff;
+  --accent-hover: #2433d6;
+  --accent-text: #2c3ef0;
+  --accent-soft: #e8ebff;
   --on-accent: #ffffff;
-  --dot: #d9d1c3;
-  --added-bg: #dcf3e3;
-  --added-fg: #14532d;
-  --removed-bg: #fde3dc;
-  --removed-fg: #9a2d12;
+  --highlight: #ffe45c;
+  --hero-from: #2433d6;
+  --hero-via: #4a3cf0;
+  --hero-to: #7a3ff2;
+  --mint: #12b886;
+  --coral: #ff6b5b;
+  --violet: #8b5cf6;
+  --sun: #ffc93c;
+  --dot: rgb(255 255 255 / 0.16);
+  --added-bg: #d3f9e4;
+  --added-fg: #0b5d3b;
+  --removed-bg: #ffe1dd;
+  --removed-fg: #a3271c;
 }
 
 .dark {
-  --background: #12110f;
-  --surface: #1b1a17;
-  --surface-muted: #24221e;
-  --foreground: #efe9df;
-  --muted: #a39b8f;
-  --border: #302c27;
-  --accent: #ea580c;
-  --accent-hover: #f97316;
-  --accent-text: #fb923c;
-  --accent-soft: #3d2416;
-  --on-accent: #ffffff;
-  --dot: #2c2924;
-  --added-bg: #163a24;
-  --added-fg: #a7f0c0;
-  --removed-bg: #46201a;
-  --removed-fg: #ffb8a6;
+  --background: #0a0d1f;
+  --surface: #11152f;
+  --surface-muted: #1a1f45;
+  --tint: #0e1229;
+  --foreground: #eef0ff;
+  --muted: #a3a8c9;
+  --border: #252b55;
+  --accent: #6f7dff;
+  --accent-hover: #8c97ff;
+  --accent-text: #9aa4ff;
+  --accent-soft: #1d2354;
+  --on-accent: #0a0d1f;
+  --highlight: #f5d94e;
+  --hero-from: #1b2499;
+  --hero-via: #3326b5;
+  --hero-to: #5a26b8;
+  --dot: rgb(255 255 255 / 0.1);
+  --added-bg: #123d2b;
+  --added-fg: #9ff0c8;
+  --removed-bg: #4a1b17;
+  --removed-fg: #ffb3aa;
 }
 
 @theme inline {
@@ -58,9 +72,15 @@
   --color-added-fg: var(--added-fg);
   --color-removed-bg: var(--removed-bg);
   --color-removed-fg: var(--removed-fg);
+  --color-tint: var(--tint);
+  --color-highlight: var(--highlight);
+  --color-mint: var(--mint);
+  --color-coral: var(--coral);
+  --color-violet: var(--violet);
+  --color-sun: var(--sun);
   --font-sans: var(--font-geist-sans);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  --font-display: var(--font-fraunces);
+  --font-display: var(--font-bricolage);
 }
 
 html {
@@ -82,28 +102,54 @@ body {
   color: var(--foreground);
 }
 
-/* Soft card shadow used by the tool and feature cards. */
+/* Card shadow for the tool and feature cards. */
 @utility shadow-card {
   box-shadow:
-    0 1px 0 rgb(0 0 0 / 0.02),
-    0 24px 60px -28px rgb(60 40 20 / 0.28);
+    0 1px 2px rgb(14 19 48 / 0.06),
+    0 30px 70px -30px rgb(36 51 214 / 0.35);
 }
 
-/* Dotted paper texture behind the hero, fading out downwards. */
+/* Cobalt-to-violet hero band with a faint dot texture. */
+.hero-band {
+  background:
+    radial-gradient(var(--dot) 1.1px, transparent 1.1px) 0 0 / 22px 22px,
+    radial-gradient(120% 140% at 85% 0%, var(--hero-to) 0%, transparent 55%),
+    linear-gradient(135deg, var(--hero-from) 0%, var(--hero-via) 60%, var(--hero-to) 100%);
+}
 .hero-dots {
   background-image: radial-gradient(var(--dot) 1.1px, transparent 1.1px);
   background-size: 22px 22px;
-  mask-image: linear-gradient(to bottom, black 0%, black 40%, transparent 85%);
 }
 
-/* Highlighter swash behind an emphasised word in headings. */
+/* Highlighter stroke behind a key word in headings. */
 .swash {
-  font-style: italic;
-  color: var(--accent-text);
-  background: linear-gradient(100deg, transparent 1%, var(--accent-soft) 2%, var(--accent-soft) 98%, transparent 99%) 0 88% / 100% 0.38em
+  color: #0e1330;
+  background: linear-gradient(100deg, transparent 0.5%, var(--highlight) 1.5%, var(--highlight) 98%, transparent 99.5%) 0 72% / 100% 0.82em
     no-repeat;
-  padding: 0 0.08em;
+  padding: 0 0.12em;
+  margin: 0 -0.04em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
+
+/* Colored tiles that number cards, cycling through the accent colors. */
+.tile {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.85rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.tile-0 { background: var(--accent-soft); color: var(--accent-text); }
+.tile-1 { background: color-mix(in srgb, var(--mint) 18%, transparent); color: var(--mint); }
+.tile-2 { background: color-mix(in srgb, var(--coral) 18%, transparent); color: var(--coral); }
+.tile-3 { background: color-mix(in srgb, var(--sun) 28%, transparent); color: #9a6a00; }
+.tile-4 { background: color-mix(in srgb, var(--violet) 18%, transparent); color: var(--violet); }
+.dark .tile-3 { color: var(--sun); }
 
 .rise {
   animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
@@ -136,17 +182,17 @@ body {
 
 /* Long-form content pages (About, Privacy, Terms, guides) */
 .prose-page h1 {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display), system-ui, sans-serif;
   font-size: clamp(2rem, 5vw, 2.75rem);
-  font-weight: 600;
+  font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
   margin-bottom: 1.25rem;
 }
 .prose-page h2 {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display), system-ui, sans-serif;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.01em;
   margin-top: 2.5rem;
   margin-bottom: 0.75rem;

@@ -90,7 +90,7 @@ export function HumanizeTagalogContent() {
             ["Check", "Read the result aloud. Keep what sounds like you, change what doesn’t, and copy it when you’re happy."],
           ].map(([title, text], i) => (
             <li key={title} className="rounded-3xl border border-border bg-surface p-6">
-              <span className="font-display text-4xl text-accent-text italic">{i + 1}</span>
+              <span className={`tile tile-${i % 5}`}>{i + 1}</span>
               <h3 className="mt-3 text-lg font-semibold">{title}</h3>
               <p className="mt-1 leading-relaxed text-muted">{text}</p>
             </li>

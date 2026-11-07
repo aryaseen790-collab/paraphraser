@@ -4,7 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContentPage } from "@/components/ContentPage";
 import { siteConfig } from "@/config/site";
+import { Illustration } from "@/components/Illustration";
+import type { ImageKey } from "@/config/images";
 import { GUIDES, getGuide } from "@/content/guides";
+
+const GUIDE_IMAGES: Record<string, ImageKey> = {
+  "how-to-humanize-ai-content": "guideHumanize",
+  "how-to-rewrite-an-email-formally": "guideEmail",
+  "how-to-simplify-text": "guideSimplify",
+  "how-to-paraphrase-without-plagiarism": "guidePlagiarism",
+};
 
 export function generateStaticParams() {
   return GUIDES.map((g) => ({ slug: g.slug }));
@@ -44,6 +53,11 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
       </p>
       <h1>{guide.title}</h1>
       <p>{guide.description}</p>
+      {GUIDE_IMAGES[guide.slug] && (
+        <div className="my-8">
+          <Illustration name={GUIDE_IMAGES[guide.slug]} priority sizes="(min-width: 768px) 720px, 100vw" />
+        </div>
+      )}
       {guide.sections.map((s) => (
         <section key={s.heading}>
           <h2>{s.heading}</h2>

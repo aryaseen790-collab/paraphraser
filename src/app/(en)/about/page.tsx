@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentPage } from "@/components/ContentPage";
+import { Illustration } from "@/components/Illustration";
 import { usesClaude, usesGemini } from "@/config/ai";
 import { MAX_WORDS } from "@/config/limits";
 import { siteConfig } from "@/config/site";
@@ -22,6 +23,9 @@ export default function AboutPage() {
   return (
     <ContentPage>
       <h1>About {siteConfig.name}</h1>
+      <div className="my-8">
+        <Illustration name="aboutWorkspace" priority sizes="(min-width: 768px) 720px, 100vw" />
+      </div>
       <p>
         {siteConfig.name} began with a small, persistent irritation. AI tools had made it effortless to produce words,
         and somehow harder than ever to find writing that sounded like a person. Emails, cover letters and blog posts

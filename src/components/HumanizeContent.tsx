@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FAQS, type FaqItem } from "@/content/faq";
 import { Faq } from "./Faq";
+import { Illustration } from "./Illustration";
 import { LanguageChips } from "./LanguageChips";
 import { MoreTools } from "./MoreTools";
 import { Section } from "./Section";
@@ -97,6 +98,7 @@ export function HumanizeContent() {
   return (
     <>
       <Section
+        media={<Illustration name="robotToHuman" />}
         number="01 · The idea"
         title="What it actually means to humanize AI text"
         lede={
@@ -126,6 +128,9 @@ export function HumanizeContent() {
       </Section>
 
       <Section
+        tint
+        media={<Illustration name="originalVoice" />}
+        mediaLeft
         number="02 · The name"
         title={
           <>
@@ -134,7 +139,7 @@ export function HumanizeContent() {
         }
       >
         <div className="grid gap-8 md:grid-cols-[1fr_1.2fr] md:items-start">
-          <blockquote className="self-start border-l-4 border-accent pl-6 font-display text-2xl leading-snug italic">
+          <blockquote className="self-start border-l-[6px] border-highlight pl-6 font-display text-2xl leading-snug font-bold">
             OG stands for original. The aim is writing that sounds like the original version of you, not the average of
             everything on the internet.
           </blockquote>
@@ -167,7 +172,7 @@ export function HumanizeContent() {
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {TELLS.map((t, i) => (
             <li key={t.title} className="rounded-3xl border border-border bg-surface p-6">
-              <span className="font-display text-3xl text-accent-text italic">{String(i + 1).padStart(2, "0")}</span>
+              <span className={`tile tile-${i % 5}`}>{String(i + 1).padStart(2, "0")}</span>
               <h3 className="mt-2 text-lg font-semibold">{t.title}</h3>
               <p className="mt-1 leading-relaxed text-muted">{t.text}</p>
             </li>
@@ -176,6 +181,7 @@ export function HumanizeContent() {
       </Section>
 
       <Section
+        tint
         number="04 · Examples"
         title="Before and after: AI text, humanized"
         lede={<p>Three short passages of typical machine-drafted prose, and what the AI humanizer tool made of them.</p>}
@@ -183,7 +189,7 @@ export function HumanizeContent() {
         <div className="grid gap-5 lg:grid-cols-3">
           {EXAMPLES.map((e) => (
             <article key={e.label} className="flex flex-col rounded-3xl border border-border bg-surface p-6">
-              <h3 className="font-display text-xl font-semibold">{e.label}</h3>
+              <h3 className="font-display text-xl font-bold">{e.label}</h3>
               <p className="mt-4 text-[0.95rem] leading-relaxed text-muted">
                 <span className="mb-1 block font-mono text-[10px] tracking-[0.16em] uppercase">Before</span>
                 {e.before}
@@ -201,7 +207,7 @@ export function HumanizeContent() {
         </p>
       </Section>
 
-      <Section number="05 · Good uses" title="When a free AI humanizer earns its keep">
+      <Section number="05 · Good uses" title="When a free AI humanizer earns its keep" media={<Illustration name="useCases" />}>
         <div className="grid gap-8 text-lg leading-relaxed text-muted md:grid-cols-2">
           <div className="space-y-4">
             <p>
@@ -237,7 +243,7 @@ export function HumanizeContent() {
         </div>
       </Section>
 
-      <Section number="06 · Straight talk" title="A candid word about AI detectors">
+      <Section tint number="06 · Straight talk" title="A candid word about AI detectors" media={<Illustration name="detectors" />} mediaLeft>
         <div className="grid gap-8 md:grid-cols-[1.1fr_1fr]">
           <div className="space-y-4 text-lg leading-relaxed text-muted">
             <p>
@@ -253,7 +259,7 @@ export function HumanizeContent() {
             </p>
           </div>
           <aside className="self-start rounded-3xl bg-accent-soft p-6 sm:p-8">
-            <h3 className="font-display text-xl font-semibold">The honest test</h3>
+            <h3 className="font-display text-xl font-bold">The honest test</h3>
             <p className="mt-2 leading-relaxed">
               Read the humanized version aloud. If it sounds like something you’d say to a colleague across the desk,
               it’s done. If it doesn’t, edit it until it does. No detector score is a better measure than that.
@@ -290,6 +296,7 @@ export function HumanizeContent() {
 
       <Section
         id="languages"
+        tint
         number="08 · Languages"
         title="Humanize AI text in twelve languages"
         lede={
@@ -307,18 +314,17 @@ export function HumanizeContent() {
         <Faq items={HUMANIZE_FAQS} />
       </Section>
 
-      <section className="mx-auto mt-24 max-w-6xl px-4">
-        <div className="relative overflow-hidden rounded-[32px] bg-[#1d1b18] px-6 py-14 text-center text-[#f7f4ee] ring-1 ring-border sm:px-12 sm:py-20">
-          <div aria-hidden="true" className="hero-dots absolute inset-0 opacity-20" />
-          <h2 className="relative font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-            Sound like the <span className="text-[#fb923c] italic">original</span> you.
+      <section className="mx-auto mt-6 max-w-6xl px-4">
+        <div className="relative overflow-hidden rounded-[32px] hero-band px-6 py-14 text-center text-white sm:px-12 sm:py-20">
+          <h2 className="relative font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+            Sound like the <span className="swash">original</span> you.
           </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-lg opacity-75">
+          <p className="relative mx-auto mt-4 max-w-xl text-lg text-white/85">
             Paste your draft, press Humanize, and read it back. Free, every time, with nothing to sign up for.
           </p>
           <Link
             href="#tool"
-            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent transition hover:bg-accent-hover"
+            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 font-bold text-[#0e1330] shadow-lg transition hover:bg-highlight"
           >
             Humanize my text ↑
           </Link>

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
-import { Fraunces, Geist } from "next/font/google";
+import { Bricolage_Grotesque, Geist } from "next/font/google";
 import "@/app/globals.css";
 import { siteConfig } from "@/config/site";
 import { EN_CHROME } from "@/i18n/en";
@@ -13,21 +13,19 @@ import { Header } from "./Header";
 import { ThemeScript } from "./ThemeScript";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin", "latin-ext"] });
-// Headings only use weight 600, so load just that (normal + italic) instead of the
-// full variable font. Monospace labels use the system font stack.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Display face for headings: only the two weights used, to keep font downloads small.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin", "latin-ext"],
-  weight: ["600"],
-  style: ["normal", "italic"],
+  weight: ["700", "800"],
 });
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f4ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#12110f" },
+    { media: "(prefers-color-scheme: light)", color: "#2433d6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0d1f" },
   ],
 };
 
@@ -87,7 +85,7 @@ export function SiteShell({
     <html
       lang={LOCALE_INFO[locale].htmlLang}
       suppressHydrationWarning
-      className={`${geistSans.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${bricolage.variable} h-full antialiased`}
     >
       {/* Google Tag Manager: loads after the page is interactive so it doesn't slow the first paint. */}
       {siteConfig.gtmId && <GoogleTagManager gtmId={siteConfig.gtmId} />}

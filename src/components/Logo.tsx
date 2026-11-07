@@ -6,14 +6,14 @@ export function Logo({ href = "/" }: { href?: string }) {
     <Link href={href} className="group flex items-center gap-2.5" aria-label={`${siteConfig.name} home`}>
       <span
         aria-hidden="true"
-        className="inline-flex h-8 min-w-8 items-center justify-center rounded-[10px] bg-foreground px-1.5 font-display text-[15px] font-semibold text-background italic transition group-hover:rotate-[-6deg]"
+        className="inline-flex h-8 min-w-8 items-center justify-center rounded-[10px] bg-accent px-1.5 font-display text-[15px] font-extrabold text-on-accent transition group-hover:rotate-[-6deg]"
       >
         OG
       </span>
-      <span className="font-display text-xl font-semibold tracking-tight">
+      <span className="font-display text-xl font-extrabold tracking-tight">
         {siteConfig.name === "OG Humanizer" ? (
           <>
-            OG <span className="text-accent-text italic">Humanizer</span>
+            OG <span className="text-accent-text">Humanizer</span>
           </>
         ) : (
           siteConfig.name

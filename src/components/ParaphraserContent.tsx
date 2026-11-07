@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { usesGemini } from "@/config/ai";
 import { Faq } from "./Faq";
+import { Illustration } from "./Illustration";
 import { LanguageChips } from "./LanguageChips";
 import { Section } from "./Section";
 
@@ -115,6 +116,7 @@ export function ParaphraserContent() {
   return (
     <>
       <Section
+        media={<Illustration name="paraphraseConcept" />}
         number="01 · Why rewrite"
         title="Most writing gets better the second time"
         lede={
@@ -145,6 +147,7 @@ export function ParaphraserContent() {
 
       <Section
         id="styles"
+        tint
         number="02 · Styles"
         title="Eight styles, and when to reach for each"
         lede={<p>Each style is a different set of instructions. Here’s what they do, with a real example of each.</p>}
@@ -153,7 +156,7 @@ export function ParaphraserContent() {
           {STYLES.map((s) => (
             <article key={s.name} className="flex flex-col rounded-3xl border border-border bg-surface p-6 sm:p-7">
               <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-display text-2xl font-semibold">{s.name}</h3>
+                <h3 className="font-display text-2xl font-bold">{s.name}</h3>
                 <Link href={s.href} className="text-sm font-medium text-accent-text hover:underline">
                   Try {s.name} →
                 </Link>
@@ -173,7 +176,7 @@ export function ParaphraserContent() {
           ))}
           <article className="flex flex-col justify-between rounded-3xl bg-foreground p-6 text-background sm:p-7 md:col-span-2 md:flex-row md:items-end md:gap-10">
             <div>
-              <h3 className="font-display text-2xl font-semibold">Not sure which one?</h3>
+              <h3 className="font-display text-2xl font-bold">Not sure which one?</h3>
               <p className="mt-2 leading-relaxed opacity-75">
                 Run your text through Standard first. If it’s too casual, switch to Formal; if it’s too long, try
                 Shorten; if it sounds like a machine wrote it, Humanize. Your text stays in the box while you switch, so
@@ -220,7 +223,7 @@ export function ParaphraserContent() {
             </p>
           </div>
           <div className="rounded-3xl border border-border bg-surface p-6 sm:p-8">
-            <h3 className="font-display text-2xl font-semibold">Free AI humanizer</h3>
+            <h3 className="font-display text-2xl font-bold">Free AI humanizer</h3>
             <p className="mt-2 leading-relaxed text-muted">
               Make it sound human in one click, with examples, tips and an honest FAQ.
             </p>
@@ -243,6 +246,9 @@ export function ParaphraserContent() {
       </Section>
 
       <Section
+        tint
+        media={<Illustration name="writingDesk" />}
+        mediaLeft
         number="04 · Tips"
         title="How to get a better rewrite"
         lede={<p>A few habits make a real difference to what comes back.</p>}
@@ -250,7 +256,7 @@ export function ParaphraserContent() {
         <ol className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
           {TIPS.map((t, i) => (
             <li key={t.title} className="border-t border-border pt-5">
-              <span className="font-display text-3xl text-accent-text italic">{String(i + 1).padStart(2, "0")}</span>
+              <span className={`tile tile-${i % 5}`}>{String(i + 1).padStart(2, "0")}</span>
               <h3 className="mt-2 text-lg font-semibold">{t.title}</h3>
               <p className="mt-1 leading-relaxed text-muted">{t.text}</p>
             </li>
@@ -280,11 +286,11 @@ export function ParaphraserContent() {
         </div>
       </Section>
 
-      <Section number="06 · Who it’s for" title="Built for everyday writing">
+      <Section tint number="06 · Who it’s for" title="Built for everyday writing">
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {AUDIENCES.map((a) => (
             <div key={a.title} className="rounded-3xl border border-border bg-surface p-6">
-              <h3 className="font-display text-xl font-semibold">{a.title}</h3>
+              <h3 className="font-display text-xl font-bold">{a.title}</h3>
               <p className="mt-2 leading-relaxed text-muted">{a.text}</p>
             </div>
           ))}
@@ -293,7 +299,7 @@ export function ParaphraserContent() {
 
       <Section number="07 · Fair use" title="Use it honestly">
         <div className="grid gap-8 md:grid-cols-2">
-          <blockquote className="self-start border-l-4 border-accent pl-6 font-display text-2xl leading-snug italic">
+          <blockquote className="self-start border-l-[6px] border-highlight pl-6 font-display text-2xl leading-snug font-bold">
             A rewritten sentence is still somebody’s idea. If the idea wasn’t yours, it needs a citation, however
             different the words are.
           </blockquote>
@@ -314,7 +320,7 @@ export function ParaphraserContent() {
         </div>
       </Section>
 
-      <Section number="08 · Privacy" title="Your words, kept out of sight">
+      <Section tint number="08 · Privacy" title="Your words, kept out of sight">
         <div className="max-w-3xl space-y-4 text-lg leading-relaxed text-muted">
           <p>
             We don’t ask who you are, and there’s nothing to sign up for. Your text is sent to the AI model only to
@@ -343,18 +349,17 @@ export function ParaphraserContent() {
         <Faq />
       </Section>
 
-      <section className="mx-auto mt-24 max-w-6xl px-4">
-        <div className="relative overflow-hidden rounded-[32px] bg-[#1d1b18] px-6 py-14 text-center text-[#f7f4ee] ring-1 ring-border sm:px-12 sm:py-20">
-          <div aria-hidden="true" className="hero-dots absolute inset-0 opacity-20" />
-          <h2 className="relative font-display text-4xl font-semibold tracking-tight sm:text-5xl">
-            Your next draft is <span className="text-[#fb923c] italic">one click</span> away.
+      <section className="mx-auto mt-6 max-w-6xl px-4">
+        <div className="relative overflow-hidden rounded-[32px] hero-band px-6 py-14 text-center text-white sm:px-12 sm:py-20">
+          <h2 className="relative font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+            Your next draft is <span className="swash">one click</span> away.
           </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-lg opacity-75">
+          <p className="relative mx-auto mt-4 max-w-xl text-lg text-white/85">
             Paste your text, choose a style and see what a second version looks like. It’s free, every time.
           </p>
           <Link
             href="#tool"
-            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent transition hover:bg-accent-hover"
+            className="relative mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 font-bold text-[#0e1330] shadow-lg transition hover:bg-highlight"
           >
             Start rewriting ↑
           </Link>

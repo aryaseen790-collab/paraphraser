@@ -16,8 +16,8 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: 80,
-          background: "#f7f4ee",
-          color: "#1d1b18",
+          background: "linear-gradient(135deg, #2433d6 0%, #4a3cf0 60%, #7a3ff2 100%)",
+          color: "#ffffff",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 40, fontWeight: 700 }}>
@@ -26,9 +26,9 @@ export default function OpengraphImage() {
               width: 72,
               height: 72,
               borderRadius: 16,
-              background: "#1d1b18",
-              fontStyle: "italic",
-              color: "#fff",
+              background: "#ffffff",
+              color: "#2433d6",
+              fontWeight: 800,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -39,9 +39,9 @@ export default function OpengraphImage() {
           {siteConfig.name}
         </div>
         <div style={{ marginTop: 40, fontSize: 76, fontWeight: 800, lineHeight: 1.05, display: "flex", flexWrap: "wrap" }}>
-          Make AI text sound like&nbsp;<span style={{ color: "#c2410c", fontStyle: "italic" }}>you</span>.
+          Make AI text sound like&nbsp;<span style={{ background: "#ffe45c", color: "#0e1330", padding: "0 12px", borderRadius: 8 }}>you</span>.
         </div>
-        <div style={{ marginTop: 24, fontSize: 34, color: "#6b655c" }}>
+        <div style={{ marginTop: 24, fontSize: 34, color: "rgba(255,255,255,0.85)" }}>
           Free AI humanizer · 12 languages · No sign-up
         </div>
       </div>

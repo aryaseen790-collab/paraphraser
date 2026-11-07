@@ -23,10 +23,7 @@ interface ParaphraserProps {
 }
 
 function Highlighted({ segments, kind }: { segments: Segment[]; kind: "added" | "removed" }) {
-  const cls =
-    kind === "added"
-      ? "rounded-sm bg-added-bg text-added-fg"
-      : "rounded-sm bg-removed-bg text-removed-fg";
+  const cls = kind === "added" ? "rounded-sm bg-added-bg text-added-fg" : "rounded-sm bg-removed-bg text-removed-fg";
   return (
     <>
       {segments.map((s, i) =>
@@ -182,13 +179,20 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
 
   const outputWords = countWords(output);
   const actionLabel = mode === "humanize" ? t.actionHumanize : t.actionParaphrase;
-  const panelText = "min-h-56 flex-1 px-4 py-3 text-[1.0625rem] leading-relaxed sm:px-5 md:min-h-80";
+  const panelText = "min-h-32 flex-1 px-4 py-3 text-[1.0625rem] leading-relaxed sm:min-h-44 sm:px-5 md:min-h-48";
 
   return (
-    <section aria-label={t.toolLabel} className="relative rounded-[28px] border border-border bg-surface shadow-card">
+    <section
+      aria-label={t.toolLabel}
+      className="relative rounded-[28px] border border-border bg-surface shadow-card ring-1 ring-black/[0.02]"
+    >
       {/* Controls */}
       <div className="flex flex-col gap-3 border-b border-border p-3 sm:p-4 xl:flex-row xl:items-center xl:justify-between">
-        <div role="radiogroup" aria-label={t.styleLabel} className="-mx-1 flex min-w-0 gap-1.5 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible md:pb-0">
+        <div
+          role="radiogroup"
+          aria-label={t.styleLabel}
+          className="-mx-1 flex min-w-0 gap-1.5 overflow-x-auto px-1 pb-1 md:flex-wrap md:overflow-visible md:pb-0"
+        >
           {MODES.map((m) => (
             <button
               key={m.id}
@@ -199,7 +203,7 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
               onClick={() => setMode(m.id)}
               className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
                 mode === m.id
-                  ? "border-foreground bg-foreground text-background"
+                  ? "border-accent bg-accent text-on-accent shadow-sm"
                   : "border-border bg-surface text-muted hover:border-foreground/40 hover:text-foreground"
               }`}
             >
@@ -223,9 +227,10 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
         </label>
       </div>
 
-      {/* Panels: original left, rewrite right (stacked on phones) */}
-      <div className="grid md:grid-cols-2">
-        <div className="flex flex-col border-b border-border md:border-r md:border-b-0">
+      {/* Panels: original left, rewrite right. On phones the action bar sits right under the
+          input (type, tap, read), and the rewrite follows below it. */}
+      <div className="flex flex-col md:grid md:grid-cols-2">
+        <div className="order-1 flex flex-col border-b border-border md:border-r md:border-b-0">
           <div className="px-4 pt-4 font-mono text-[11px] tracking-[0.16em] text-muted uppercase sm:px-5">{t.yourText}</div>
           {showOriginalDiff ? (
             <div
@@ -299,17 +304,13 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
           </div>
         </div>
 
-        <div className="flex flex-col">
+        <div className="order-3 flex flex-col md:order-2">
           <div className="px-4 pt-4 font-mono text-[11px] tracking-[0.16em] text-muted uppercase sm:px-5">{t.rewrite}</div>
           <div dir="auto" aria-live="polite" aria-busy={busy} className={`${panelText} whitespace-pre-wrap`}>
             {status === "loading" && <span className="animate-pulse text-muted">{t.rewriting}</span>}
             {highlight ? <Highlighted segments={diff!.rewrite} kind="added" /> : output}
-            {status === "streaming" && (
-              <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-accent align-middle" />
-            )}
-            {status === "idle" && !output && (
-              <span className="text-muted/70">{t.outputPlaceholder}</span>
-            )}
+            {status === "streaming" && <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-accent align-middle" />}
+            {status === "idle" && !output && <span className="text-muted/70">{t.outputPlaceholder}</span>}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 pb-3 text-sm sm:px-5">
             <span className="text-muted">{output ? fill(t.outputWords, { count: fmt(outputWords) }) : ""}</span>
@@ -336,38 +337,52 @@ export function Paraphraser({ defaultMode = DEFAULT_MODE, defaultLanguage = AUTO
             </div>
           </div>
         </div>
-      </div>
+        {/* Turnstile shows a checkbox here only if Cloudflare is unsure about a visitor. */}
+        <div className="order-2 md:order-3 md:col-span-2">
+          <div ref={turnstile.containerRef} className="flex justify-center empty:hidden" />
 
-      {/* Turnstile shows a checkbox here only if Cloudflare is unsure about a visitor. */}
-      <div ref={turnstile.containerRef} className="flex justify-center empty:hidden" />
-
-      {/* Action bar */}
-      <div className="flex flex-col-reverse gap-3 border-t border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 sm:pl-5">
-        <p role="status" className={`text-sm empty:hidden sm:min-h-5 ${status === "error" ? "text-red-600 dark:text-red-400" : "text-muted"}`}>
-          {message ??
-            (overLimit ? (
-              fill(t.overLimit, { max: fmt(MAX_WORDS) })
-            ) : (
-              <span className="hidden sm:inline">
-                {t.tipBefore} <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">{t.ctrlKey}</kbd> +{" "}
-                <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd>{" "}
-                {fill(t.tipAfter, { action: actionLabel.toLowerCase() })}
-              </span>
-            ))}
-        </p>
-        <button
-          type="button"
-          onClick={() => void paraphrase()}
-          disabled={!canSubmit}
-          className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent shadow-sm transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-        >
-          {busy ? (mode === "humanize" ? t.busyHumanize : t.busyParaphrase) : actionLabel}
-          {!busy && (
-            <svg viewBox="0 0 16 16" className="h-4 w-4 transition group-hover:translate-x-0.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-              <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </button>
+          {/* Action bar */}
+          <div className="flex flex-col-reverse gap-3 border-b border-border p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4 sm:pl-5 md:border-t md:border-b-0">
+            <p
+              role="status"
+              className={`text-sm empty:hidden sm:min-h-5 ${status === "error" ? "text-red-600 dark:text-red-400" : "text-muted"}`}
+            >
+              {message ??
+                (overLimit ? (
+                  fill(t.overLimit, { max: fmt(MAX_WORDS) })
+                ) : (
+                  <span className="hidden sm:inline">
+                    {t.tipBefore}{" "}
+                    <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">
+                      {t.ctrlKey}
+                    </kbd>{" "}
+                    + <kbd className="rounded border border-border bg-surface-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd>{" "}
+                    {fill(t.tipAfter, { action: actionLabel.toLowerCase() })}
+                  </span>
+                ))}
+            </p>
+            <button
+              type="button"
+              onClick={() => void paraphrase()}
+              disabled={!canSubmit}
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-on-accent shadow-sm transition hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+            >
+              {busy ? (mode === "humanize" ? t.busyHumanize : t.busyParaphrase) : actionLabel}
+              {!busy && (
+                <svg
+                  viewBox="0 0 16 16"
+                  className="h-4 w-4 transition group-hover:translate-x-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  aria-hidden="true"
+                >
+                  <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
